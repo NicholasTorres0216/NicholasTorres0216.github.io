@@ -21,7 +21,7 @@
             box-sizing: border-box;
         }
         .header-bar {
-            background-color: #5c636a;
+            background-color: #2f363d;
             width: 100%;
             padding: 20px;
             text-align: center;
