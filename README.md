@@ -21,7 +21,7 @@
             box-sizing: border-box;
         }
         .header-bar {
-            background-color: #2f363d;
+            background-color: #5c636a;
             width: 100%;
             padding: 20px;
             text-align: center;
@@ -120,7 +120,5 @@
         <p>Created by Nicholas Torres</p>
     </div>
 
-</body>
-</html>
 </body>
 </html>
