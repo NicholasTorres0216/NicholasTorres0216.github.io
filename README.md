@@ -9,8 +9,8 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #2c3e50;
-            color: #333;
+            background-color: #2f363d;
+            color: #f0f4f8;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -21,7 +21,7 @@
             box-sizing: border-box;
         }
         .header-bar {
-            background-color: #e2e8f0;
+            background-color: #f0f4f8;
             width: 100%;
             padding: 20px;
             text-align: center;
