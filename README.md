@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,8 +9,8 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #2f363d;
-            color: #f0f4f8;
+            background-color: white;
+            color: #1a202c;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -22,14 +21,14 @@
             box-sizing: border-box;
         }
         .header-bar {
-            background-color: #f0f4f8;
+            background-color: #2f363d;
             width: 100%;
             padding: 20px;
             text-align: center;
             margin-bottom: 20px;
         }
         .main-content {
-            background-color: #ffffff;
+            background-color: #f0f4f8;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             padding: 40px;
@@ -40,7 +39,7 @@
         }
         h1 {
             font-weight: 700;
-            color: #1a202c;
+            color: #f0f4f8;
             margin-bottom: 8px;
             font-size: 2.5rem;
             text-align: center;
@@ -82,7 +81,7 @@
         .footer {
             margin-top: auto; /* Push the footer to the bottom */
             padding-bottom: 20px;
-            color: #a0aec0;
+            color: #4a5568;
             font-size: 0.875rem;
         }
         @media (max-width: 640px) {
@@ -121,5 +120,7 @@
         <p>Created by Nicholas Torres</p>
     </div>
 
+</body>
+</html>
 </body>
 </html>
