@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8;
+            background-color: #2c3e50;
             color: #333;
             display: flex;
             flex-direction: column;
@@ -21,7 +21,7 @@
             box-sizing: border-box;
         }
         .header-bar {
-            background-color: #6588ab;
+            background-color: #e2e8f0;
             width: 100%;
             padding: 20px;
             text-align: center;
@@ -56,7 +56,7 @@
             height: auto;
             border-radius: 12px;
             margin-top: 20px;
-            border: 4px solid #e2e8f0;
+            border: 4px solid #f0f4f8;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         .link-bar {
