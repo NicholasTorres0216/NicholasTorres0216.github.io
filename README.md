@@ -61,7 +61,7 @@
   <main>
     <p>Welcome to my Hello World page. This simple site was created for a course assignment to demonstrate basic web hosting and HTML skills.</p>
     
-    <img src="rigby-cat-stare.gif" alt="Funny cat gif">
+    <img src="Gwyn Goofy.png" alt="Gwyn Goofy">
     
     <a href="about.html">Go to About Page</a>
   </main>
