@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8;
+            background-color: #6588ab;
             color: #333;
             display: flex;
             flex-direction: column;
