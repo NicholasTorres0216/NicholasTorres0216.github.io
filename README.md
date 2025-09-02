@@ -3,33 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello, World!</title>
+  <title>Hello World</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f9f9f9;
       color: #333;
+      margin: 0;
+      padding: 0;
       text-align: center;
-      padding: 50px;
     }
     header {
-      font-size: 3em;
-      margin-bottom: 20px;
+      background: #333;
+      color: #fff;
+      padding: 20px 0;
+      font-size: 1.8em;
+      font-weight: bold;
+    }
+    main {
+      padding: 40px 20px;
     }
     p {
-      font-size: 1.2em;
-      margin: 10px 0;
+      font-size: 1.1em;
+      margin: 10px 0 20px;
     }
     img {
-      max-width: 350px;
-      margin: 30px auto;
+      max-width: 400px;
+      margin: 20px auto;
       display: block;
-      border-radius: 10px;
+      border-radius: 8px;
     }
     a {
       display: inline-block;
       margin-top: 20px;
-      font-size: 1.1em;
+      font-size: 1em;
       color: #0066cc;
       text-decoration: none;
       border: 1px solid #0066cc;
@@ -42,22 +49,25 @@
       color: #fff;
     }
     footer {
-      margin-top: 40px;
+      margin: 40px 0 20px;
       font-size: 0.9em;
       color: #777;
     }
   </style>
 </head>
 <body>
-  <header>Hello, World!</header>
+  <header>Hello World</header>
   
-  <p>This page was created for my Web Systems class.</p>
-  <p>Enjoy this picture, it's on the house.</p>
-  
-  <img src="rigby-cat-stare.gif" alt="Funny cat gif">
-  
-  <a href="about.html">Go to About Page</a>
+  <main>
+    <p>Welcome to my Hello World page. This simple site was created for a course assignment to demonstrate basic web hosting and HTML skills.</p>
+    
+    <img src="rigby-cat-stare.gif" alt="Funny cat gif">
+    
+    <a href="about.html">Go to About Page</a>
+  </main>
   
   <footer>
+    Created for Web Systems class
+  </footer>
 </body>
 </html>
