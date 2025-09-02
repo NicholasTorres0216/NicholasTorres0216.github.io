@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -16,9 +15,10 @@
     header {
       background: #333;
       color: #fff;
-      padding: 20px 0;
-      font-size: 1.8em;
+      padding: 30px 0;
+      font-size: 2em;
       font-weight: bold;
+      width: 100%;
     }
     main {
       padding: 40px 20px;
