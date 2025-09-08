@@ -182,10 +182,20 @@
         </ul>
     </nav>
 
-    <main>
-        <section class="profile-section">
-            <img src="Gwyn Goofy.png" alt="An image of the user's dog, Gwyn." class="profile-image">
-            <p>This page was created for Assignment 2 for COP4813, My Web Systems class.</p>
+   <main>
+        <!-- Home Page Content -->
+        <section id="home-page" class="page-content active">
+            <div class="profile-section">
+                <img src="Gwyn Goofy.png" alt="An image of the user's dog, Gwyn." class="profile-image">
+                <p>This page was created for Assignment 2 of my COP4813 Web Systems class.</p>
+            </div>
+        </section>
+
+        <!-- Second Page Content -->
+        <section id="second-page" class="page-content">
+            <div class="profile-section">
+                <p>Meeting the second page requirement.</p>
+            </div>
         </section>
     </main>
 
