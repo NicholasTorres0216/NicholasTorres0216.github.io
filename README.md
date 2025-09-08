@@ -1,4 +1,3 @@
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -202,7 +201,7 @@
         <!-- Second Page Content -->
         <section id="second-page" class="page-content">
             <div class="profile-section">
-                <p>Meeting the second page requirement.</p>
+                <p>Meeting the second page requirements.</p>
             </div>
         </section>
     </main>
@@ -210,5 +209,16 @@
     <footer>
         <p>Created by Nicholas Torres</p>
     </footer>
-</body>
-</html>
+
+    <script>
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show the selected page
+            document.getElementById(pageId).classList.add('active');
+        }
+    </script>
