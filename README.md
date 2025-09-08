@@ -186,10 +186,16 @@
                     <li><a href="https://music.youtube.com" target="_blank">Youtube Music</a></li>
                 </ul>
             </li>
+            <li class="dropdown">
+                <a href="#">Other Page</a>
+                <ul class="dropdown-content">
+                    <li><a href="#" onclick="showPage('second-page')">Second Page</a></li>
+                </ul>
+            </li>
         </ul>
     </nav>
 
-   <main>
+    <main>
         <!-- Home Page Content -->
         <section id="home-page" class="page-content active">
             <div class="profile-section">
@@ -222,3 +228,5 @@
             document.getElementById(pageId).classList.add('active');
         }
     </script>
+</body>
+</html>
