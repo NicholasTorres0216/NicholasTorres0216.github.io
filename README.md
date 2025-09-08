@@ -185,7 +185,7 @@
     <main>
         <section class="profile-section">
             <img src="Gwyn Goofy.png" alt="An image of the user's dog, Gwyn." class="profile-image">
-            <p>This page was created for Assignment 2 of my COP4813 Web Systems class.</p>
+            <p>This page was created for Assignment 2 for COP4813, My Web Systems class.</p>
         </section>
     </main>
 
