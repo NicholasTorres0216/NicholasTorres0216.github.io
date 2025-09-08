@@ -50,16 +50,14 @@
     <main>
         <section class="profile-section">
             <img src="Gwyn Goofy.png" alt="An image of the user's dog, Gwyn." class="profile-image">
-            <p>This page was created for Assignment 2 of my COP4813 Web Systems class. It serves as a portfolio to demonstrate my skills in web development.</p>
+            <p>This page was created for Assignment 2 of my COP4813 Web Systems class.</p>
         </section>
     </main>
 
     <footer>
-        <p>&copy; 2025 Nicholas Torres</p>
         <p>Created by Nicholas Torres</p>
     </footer>
 
-</body>
 
 </body>
 </html>
