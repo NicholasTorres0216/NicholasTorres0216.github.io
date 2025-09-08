@@ -207,7 +207,7 @@
         <!-- Second Page Content -->
         <section id="second-page" class="page-content">
             <div class="profile-section">
-                <p>Meeting the second page requirements.</p>
+                <p>Meeting the second page requirement.</p>
             </div>
         </section>
     </main>
