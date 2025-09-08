@@ -99,6 +99,14 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
+        .page-content {
+            display: none; /* Hide all page content by default */
+        }
+
+        .page-content.active {
+            display: block; /* Show the active page */
+        }
+
         .profile-section {
             text-align: center;
         }
