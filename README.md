@@ -158,11 +158,11 @@
             <li class="dropdown">
                 <a href="#">My Classes</a>
                 <ul class="dropdown-content">
-                    <li><a href="https://class.daytonastate.edu/d2l/home/487729" target="_blank">COP4610</a></li>
+                    <li><a href="https://class.daytonastate.edu/d2l/home/487300" target="_blank">COP4610</a></li>
                     <li><a href="https://class.daytonastate.edu/d2l/home/486120" target="_blank">CET4884</a></li>
                     <li><a href="https://class.daytonastate.edu/d2l/home/489975" target="_blank">CEN4801</a></li>
                     <li><a href="https://class.daytonastate.edu/d2l/home/487548" target="_blank">CNT4007</a></li>
-                    <li><a href="https://class.daytonastate.edu/d2l/home/4873" target="_blank">COP4813</a></li>
+                    <li><a href="https://class.daytonastate.edu/d2l/home/487729" target="_blank">COP4813</a></li>
                 </ul>
             </li>
             <li class="dropdown">
