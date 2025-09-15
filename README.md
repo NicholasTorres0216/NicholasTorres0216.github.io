@@ -390,7 +390,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="phone">Phone Number (US)</label>
+                        <label for="phone">Phone Number (U.S)</label>
                         <input type="tel" id="phone" name="phone" placeholder="(000) 000-0000">
                         <span class="validation-message" id="phoneError"></span>
                     </div>
