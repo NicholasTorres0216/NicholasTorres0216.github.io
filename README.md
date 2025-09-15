@@ -647,5 +647,3 @@ ${formData.message}`;
         }
     </script>
 </body>
-
-</html>
