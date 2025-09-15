@@ -390,7 +390,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="phone">Phone Number</label>
+                        <label for="phone">Phone Number (US)</label>
                         <input type="tel" id="phone" name="phone" placeholder="(000) 000-0000">
                         <span class="validation-message" id="phoneError"></span>
                     </div>
@@ -408,7 +408,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="message">Message</label>
+                        <label for="message">Message / Note</label>
                         <textarea id="message" name="message" placeholder="Type your message here..."></textarea>
                         <span class="validation-message" id="messageError"></span>
                     </div>
