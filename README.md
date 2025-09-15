@@ -100,10 +100,16 @@
 
         .page-content {
             display: none; /* Hide all page content by default */
+            animation: fadeIn 0.5s ease-in-out;
         }
 
         .page-content.active {
             display: block; /* Show the active page */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .profile-section {
@@ -118,6 +124,148 @@
             border: 4px solid #ddd;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             margin-bottom: 1.5rem;
+        }
+        
+        /* Form styling */
+        .form-section {
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-section h2 {
+            text-align: center;
+            color: #2f363d;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="date"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4a5568;
+            box-shadow: 0 0 5px rgba(74, 85, 104, 0.5);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group .name-inputs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-group .name-inputs > div {
+            flex: 1;
+        }
+        
+        .form-group .address-inputs {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 600px) {
+            .form-group .address-inputs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .form-group .address-inputs.last-row {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .form-group .address-inputs.last-row input {
+            grid-column: span 1;
+        }
+
+        .form-group .address-inputs.last-row select {
+            grid-column: span 1;
+        }
+        
+        .validation-message {
+            color: #d9534f;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .form-group.invalid input,
+        .form-group.invalid select,
+        .form-group.invalid textarea {
+            border-color: #d9534f;
+            box-shadow: 0 0 5px rgba(217, 83, 79, 0.5);
+        }
+        
+        .submit-btn, .confirm-btn, .back-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: #2f363d;
+            color: #f0f4f8;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.125rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .submit-btn:hover, .confirm-btn:hover, .back-btn:hover {
+            background-color: #4a5568;
+        }
+        
+        .confirmation-page h2 {
+            text-align: center;
+            color: #2f363d;
+            margin-bottom: 1.5rem;
+        }
+        
+        .confirmation-page p {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+        }
+        
+        .confirmation-page strong {
+            color: #4a5568;
+        }
+
+        .confirmation-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .confirmation-actions .confirm-btn, .confirmation-actions .back-btn {
+            flex: 1;
         }
 
         /* Footer styling */
@@ -161,7 +309,7 @@
 
     <nav>
         <ul class="nav-menu">
-            <li><a href="index.html">Home</a></li>
+            <li><a href="#" onclick="showPage('home-page')">Home</a></li>
             <li class="dropdown">
                 <a href="#">My Classes</a>
                 <ul class="dropdown-content">
@@ -192,6 +340,7 @@
                     <li><a href="#" onclick="showPage('second-page')">Second Page</a></li>
                 </ul>
             </li>
+            <li><a href="#" onclick="showPage('form-page')">Contact Form</a></li>
         </ul>
     </nav>
 
@@ -210,6 +359,97 @@
                 <p>Meeting the second page requirement.</p>
             </div>
         </section>
+
+        <!-- Contact Form Page -->
+        <section id="form-page" class="page-content">
+            <div id="form-container" class="form-section">
+                <h2>Contact Form</h2>
+                <form id="contactForm">
+                    <!-- Name -->
+                    <div class="form-group">
+                        <label for="firstName">Full Name</label>
+                        <div class="name-inputs">
+                            <div>
+                                <input type="text" id="firstName" name="firstName" placeholder="First Name">
+                                <span class="validation-message" id="firstNameError"></span>
+                            </div>
+                            <div>
+                                <input type="text" id="lastName" name="lastName" placeholder="Last Name">
+                                <span class="validation-message" id="lastNameError"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Address -->
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <div class="address-inputs">
+                            <input type="text" id="address" name="address" placeholder="Street Address">
+                            <span class="validation-message" id="addressError"></span>
+                            <input type="text" id="city" name="city" placeholder="City">
+                            <span class="validation-message" id="cityError"></span>
+                            <select id="state" name="state">
+                                <option value="">Select State</option>
+                                <option value="FL">Florida</option>
+                                <option value="CA">California</option>
+                                <option value="NY">New York</option>
+                                <option value="TX">Texas</option>
+                                <option value="IL">Illinois</option>
+                            </select>
+                            <span class="validation-message" id="stateError"></span>
+                            <input type="text" id="zip" name="zip" placeholder="Zip Code">
+                            <span class="validation-message" id="zipError"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone Number -->
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="(000) 000-0000">
+                        <span class="validation-message" id="phoneError"></span>
+                    </div>
+                    
+                    <!-- Email Address -->
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="name@example.com">
+                        <span class="validation-message" id="emailError"></span>
+                    </div>
+                    
+                    <!-- Birth Date -->
+                    <div class="form-group">
+                        <label for="birthdate">Birth Date</label>
+                        <input type="date" id="birthdate" name="birthdate">
+                        <span class="validation-message" id="birthdateError"></span>
+                    </div>
+                    
+                    <!-- Message -->
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" placeholder="Type your message here..."></textarea>
+                        <span class="validation-message" id="messageError"></span>
+                    </div>
+
+                    <!-- Confirmation -->
+                    <div class="form-group">
+                        <label for="captcha">Security Question: What is <span id="num1"></span> + <span id="num2"></span>?</label>
+                        <input type="text" id="captcha" name="captcha">
+                        <span class="validation-message" id="captchaError"></span>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Submit</button>
+                </form>
+            </div>
+            
+            <div id="confirmation-container" class="form-section" style="display: none;">
+                <h2>Confirm Your Information</h2>
+                <div id="confirmation-details"></div>
+                <div class="confirmation-actions">
+                    <button class="back-btn" onclick="showForm()">Go Back to Form</button>
+                    <button class="confirm-btn" onclick="sendEmail()">Confirm & Send</button>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -217,6 +457,24 @@
     </footer>
 
     <script>
+        // Global state for captcha and collected data
+        let captchaResult;
+        let formData = {};
+
+        // Generate a random captcha question on page load
+        window.onload = function() {
+            generateCaptcha();
+            setupValidationListeners();
+        };
+
+        function generateCaptcha() {
+            const num1 = Math.floor(Math.random() * 10);
+            const num2 = Math.floor(Math.random() * 10);
+            document.getElementById('num1').textContent = num1;
+            document.getElementById('num2').textContent = num2;
+            captchaResult = num1 + num2;
+        }
+
         function showPage(pageId) {
             // Hide all pages
             const pages = document.querySelectorAll('.page-content');
@@ -226,7 +484,198 @@
 
             // Show the selected page
             document.getElementById(pageId).classList.add('active');
+            
+            // Re-generate captcha if showing the form
+            if (pageId === 'form-page') {
+                generateCaptcha();
+                showForm();
+            }
+        }
+
+        function showForm() {
+            document.getElementById('form-container').style.display = 'block';
+            document.getElementById('confirmation-container').style.display = 'none';
+        }
+
+        function showConfirmationPage() {
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('confirmation-container').style.display = 'block';
+        }
+        
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Stop the form from submitting normally
+            
+            // Perform validation
+            if (validateForm()) {
+                // Collect form data
+                formData = {
+                    firstName: document.getElementById('firstName').value.trim(),
+                    lastName: document.getElementById('lastName').value.trim(),
+                    address: document.getElementById('address').value.trim(),
+                    city: document.getElementById('city').value.trim(),
+                    state: document.getElementById('state').value,
+                    zip: document.getElementById('zip').value.trim(),
+                    phone: document.getElementById('phone').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    birthdate: document.getElementById('birthdate').value.trim(),
+                    message: document.getElementById('message').value.trim()
+                };
+                
+                // Display confirmation details
+                const confirmationDetails = document.getElementById('confirmation-details');
+                confirmationDetails.innerHTML = `
+                    <p><strong>Full Name:</strong> ${formData.firstName} ${formData.lastName}</p>
+                    <p><strong>Address:</strong> ${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}</p>
+                    <p><strong>Phone:</strong> ${formData.phone}</p>
+                    <p><strong>Email:</strong> ${formData.email}</p>
+                    <p><strong>Birth Date:</strong> ${formData.birthdate}</p>
+                    <p><strong>Message:</strong> ${formData.message}</p>
+                `;
+                
+                showConfirmationPage();
+            }
+        });
+        
+        function validateField(inputElement) {
+            const fieldId = inputElement.id;
+            const value = inputElement.value.trim();
+            let errorMessage = '';
+
+            switch (fieldId) {
+                case 'firstName':
+                    if (value === '') errorMessage = 'First name is required.';
+                    break;
+                case 'lastName':
+                    if (value === '') errorMessage = 'Last name is required.';
+                    break;
+                case 'address':
+                    if (value === '') errorMessage = 'Street address is required.';
+                    break;
+                case 'city':
+                    if (value === '') errorMessage = 'City is required.';
+                    break;
+                case 'state':
+                    if (value === '') errorMessage = 'State is required.';
+                    break;
+                case 'zip':
+                    const zipRegex = /^\d{5}(-\d{4})?$/;
+                    if (!zipRegex.test(value)) errorMessage = 'Invalid zip code format.';
+                    break;
+                case 'phone':
+                    const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+                    if (!phoneRegex.test(value.replace(/\D/g, ''))) errorMessage = 'Please enter a valid 10-digit phone number.';
+                    break;
+                case 'email':
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) errorMessage = 'Please enter a valid email address.';
+                    break;
+                case 'birthdate':
+                    if (value === '') {
+                        errorMessage = 'Birth date is required.';
+                    } else {
+                        const today = new Date();
+                        const selectedDate = new Date(value);
+                        if (selectedDate > today) {
+                            errorMessage = 'Birth date cannot be in the future.';
+                        }
+                    }
+                    break;
+                case 'message':
+                    if (value === '') errorMessage = 'Message cannot be blank.';
+                    break;
+                case 'captcha':
+                    const userCaptcha = parseInt(value);
+                    if (isNaN(userCaptcha) || userCaptcha !== captchaResult) errorMessage = 'Incorrect answer.';
+                    break;
+            }
+
+            if (errorMessage) {
+                showValidationError(fieldId + 'Error', errorMessage, inputElement);
+            } else {
+                hideValidationError(fieldId + 'Error', inputElement);
+            }
+
+            return errorMessage === '';
+        }
+
+        function validateForm() {
+            let isValid = true;
+            const formElements = document.querySelectorAll('#contactForm input, #contactForm select, #contactForm textarea');
+            formElements.forEach(el => {
+                if (el.id) { // Only validate elements with an ID
+                    if (!validateField(el)) {
+                        isValid = false;
+                    }
+                }
+            });
+            return isValid;
+        }
+
+        function showValidationError(elementId, message, inputElement) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            inputElement.closest('.form-group').classList.add('invalid');
+        }
+
+        function hideValidationError(elementId, inputElement) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+            inputElement.closest('.form-group').classList.remove('invalid');
+        }
+
+        function setupValidationListeners() {
+            const formElements = document.querySelectorAll('#contactForm input:not(#captcha), #contactForm select, #contactForm textarea');
+            formElements.forEach(el => {
+                el.addEventListener('blur', () => {
+                    validateField(el);
+                });
+                el.addEventListener('input', () => {
+                    hideValidationError(el.id + 'Error', el);
+                });
+            });
+            
+            // Special listener for phone number formatting
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', function(e) {
+                const cleanedValue = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                let formattedValue = '';
+                if (cleanedValue.length > 0) {
+                    formattedValue += '(' + cleanedValue.substring(0, 3);
+                }
+                if (cleanedValue.length >= 4) {
+                    formattedValue += ') ' + cleanedValue.substring(3, 6);
+                }
+                if (cleanedValue.length >= 7) {
+                    formattedValue += '-' + cleanedValue.substring(6, 10);
+                }
+                e.target.value = formattedValue;
+            });
+            
+            // Special listener for captcha
+            const captchaInput = document.getElementById('captcha');
+            captchaInput.addEventListener('input', () => validateField(captchaInput));
+        }
+
+        function sendEmail() {
+            // Recipient and Subject
+            const to = 'youremail@example.com'; // Replace with your email address
+            const subject = 'Contact Form Submission';
+            
+            // Body of the email
+            const body = `Full Name: ${formData.firstName} ${formData.lastName}
+Address: ${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}
+Phone: ${formData.phone}
+Email: ${formData.email}
+Birth Date: ${formData.birthdate}
+Message:
+${formData.message}`;
+            
+            const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
         }
     </script>
+</body>
 </body>
 </html>
