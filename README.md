@@ -2,12 +2,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nicholas Torres - Web Systems</title>
-    <!-- Google Fonts for a professional look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Global styles for a clean, professional look */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -34,7 +32,6 @@
             font-size: 1rem;
         }
 
-        /* Navigation menu styling */
         nav {
             background-color: #4a5568;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -64,7 +61,6 @@
             background-color: #5c636a;
         }
 
-        /* Dropdown menu styling */
         .dropdown-content {
             display: none;
             position: absolute;
@@ -88,7 +84,6 @@
             display: block;
         }
 
-        /* Main content area */
         main {
             padding: 2rem;
             max-width: 960px;
@@ -99,12 +94,12 @@
         }
 
         .page-content {
-            display: none; /* Hide all page content by default */
+            display: none;
             animation: fadeIn 0.5s ease-in-out;
         }
 
         .page-content.active {
-            display: block; /* Show the active page */
+            display: block;
         }
 
         @keyframes fadeIn {
@@ -126,7 +121,6 @@
             margin-bottom: 1.5rem;
         }
         
-        /* Form styling */
         .form-section {
             padding: 2rem;
             max-width: 600px;
@@ -160,7 +154,7 @@
             padding: 0.75rem;
             border: 1px solid #ccc;
             border-radius: 8px;
-            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            box-sizing: border-box;
             font-size: 1rem;
             transition: all 0.3s ease;
         }
@@ -268,7 +262,6 @@
             flex: 1;
         }
 
-        /* Footer styling */
         footer {
             text-align: center;
             padding: 1rem;
@@ -281,7 +274,6 @@
             margin: 0.5rem 0;
         }
 
-        /* Responsive design for smaller screens */
         @media screen and (max-width: 768px) {
             .nav-menu {
                 flex-direction: column;
@@ -294,7 +286,7 @@
             }
 
             .dropdown-content {
-                position: static; /* Make dropdown full-width on mobile */
+                position: static;
                 width: 100%;
             }
         }
@@ -345,7 +337,6 @@
     </nav>
 
     <main>
-        <!-- Home Page Content -->
         <section id="home-page" class="page-content active">
             <div class="profile-section">
                 <img src="Gwyn Goofy.png" alt="An image of the user's dog, Gwyn." class="profile-image">
@@ -353,19 +344,16 @@
             </div>
         </section>
 
-        <!-- Second Page Content -->
         <section id="second-page" class="page-content">
             <div class="profile-section">
                 <p>Meeting the second page requirement.</p>
             </div>
         </section>
 
-        <!-- Contact Form Page -->
         <section id="form-page" class="page-content">
             <div id="form-container" class="form-section">
                 <h2>Contact Form</h2>
                 <form id="contactForm">
-                    <!-- Name -->
                     <div class="form-group">
                         <label for="firstName">Full Name</label>
                         <div class="name-inputs">
@@ -380,7 +368,6 @@
                         </div>
                     </div>
                     
-                    <!-- Address -->
                     <div class="form-group">
                         <label for="address">Address</label>
                         <div class="address-inputs">
@@ -402,35 +389,30 @@
                         </div>
                     </div>
                     
-                    <!-- Phone Number -->
                     <div class="form-group">
                         <label for="phone">Phone Number</label>
                         <input type="tel" id="phone" name="phone" placeholder="(000) 000-0000">
                         <span class="validation-message" id="phoneError"></span>
                     </div>
                     
-                    <!-- Email Address -->
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input type="email" id="email" name="email" placeholder="name@example.com">
                         <span class="validation-message" id="emailError"></span>
                     </div>
                     
-                    <!-- Birth Date -->
                     <div class="form-group">
                         <label for="birthdate">Birth Date</label>
                         <input type="date" id="birthdate" name="birthdate">
                         <span class="validation-message" id="birthdateError"></span>
                     </div>
                     
-                    <!-- Message -->
                     <div class="form-group">
                         <label for="message">Message</label>
                         <textarea id="message" name="message" placeholder="Type your message here..."></textarea>
                         <span class="validation-message" id="messageError"></span>
                     </div>
 
-                    <!-- Confirmation -->
                     <div class="form-group">
                         <label for="captcha">Security Question: What is <span id="num1"></span> + <span id="num2"></span>?</label>
                         <input type="text" id="captcha" name="captcha">
@@ -457,11 +439,9 @@
     </footer>
 
     <script>
-        // Global state for captcha and collected data
         let captchaResult;
         let formData = {};
 
-        // Generate a random captcha question on page load
         window.onload = function() {
             generateCaptcha();
             setupValidationListeners();
@@ -476,16 +456,13 @@
         }
 
         function showPage(pageId) {
-            // Hide all pages
             const pages = document.querySelectorAll('.page-content');
             pages.forEach(page => {
                 page.classList.remove('active');
             });
 
-            // Show the selected page
             document.getElementById(pageId).classList.add('active');
             
-            // Re-generate captcha if showing the form
             if (pageId === 'form-page') {
                 generateCaptcha();
                 showForm();
@@ -503,11 +480,9 @@
         }
         
         document.getElementById('contactForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Stop the form from submitting normally
+            event.preventDefault();
             
-            // Perform validation
             if (validateForm()) {
-                // Collect form data
                 formData = {
                     firstName: document.getElementById('firstName').value.trim(),
                     lastName: document.getElementById('lastName').value.trim(),
@@ -521,7 +496,6 @@
                     message: document.getElementById('message').value.trim()
                 };
                 
-                // Display confirmation details
                 const confirmationDetails = document.getElementById('confirmation-details');
                 confirmationDetails.innerHTML = `
                     <p><strong>Full Name:</strong> ${formData.firstName} ${formData.lastName}</p>
@@ -602,7 +576,7 @@
             let isValid = true;
             const formElements = document.querySelectorAll('#contactForm input, #contactForm select, #contactForm textarea');
             formElements.forEach(el => {
-                if (el.id) { // Only validate elements with an ID
+                if (el.id) {
                     if (!validateField(el)) {
                         isValid = false;
                     }
@@ -636,10 +610,9 @@
                 });
             });
             
-            // Special listener for phone number formatting
             const phoneInput = document.getElementById('phone');
             phoneInput.addEventListener('input', function(e) {
-                const cleanedValue = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                const cleanedValue = e.target.value.replace(/\D/g, '');
                 let formattedValue = '';
                 if (cleanedValue.length > 0) {
                     formattedValue += '(' + cleanedValue.substring(0, 3);
@@ -653,17 +626,14 @@
                 e.target.value = formattedValue;
             });
             
-            // Special listener for captcha
             const captchaInput = document.getElementById('captcha');
             captchaInput.addEventListener('input', () => validateField(captchaInput));
         }
 
         function sendEmail() {
-            // Recipient and Subject
-            const to = 'youremail@example.com'; // Replace with your email address
+            const to = 'youremail@example.com';
             const subject = 'Contact Form Submission';
             
-            // Body of the email
             const body = `Full Name: ${formData.firstName} ${formData.lastName}
 Address: ${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}
 Phone: ${formData.phone}
@@ -677,5 +647,5 @@ ${formData.message}`;
         }
     </script>
 </body>
-</body>
+
 </html>
