@@ -317,6 +317,7 @@
                 <ul class="dropdown-content">
                     <li><a href="https://class.daytonastate.edu/d2l/le/content/487729/viewContent/7296115/View" target="_blank">Assignment 1</a></li>
                     <li><a href="https://class.daytonastate.edu/d2l/le/content/487729/viewContent/7296091/View" target="_blank">Assignment 2</a></li>
+                    <li><a href="https://class.daytonastate.edu/d2l/le/content/487729/viewContent/7296092/View" target="_blank">Assignment 3</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -390,7 +391,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="phone">Phone Number (U.S)</label>
+                        <label for="phone">Phone Number (US)</label>
                         <input type="tel" id="phone" name="phone" placeholder="(000) 000-0000">
                         <span class="validation-message" id="phoneError"></span>
                     </div>
