@@ -3,7 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nicholas Torres - Web Systems</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -404,7 +404,7 @@
             </div>
 
             <div class="form-section">
-                <h3>Quadratic Equation Calculator & Grapher</h3>
+                <h3>Quadratic Equation Calculator and Grapher</h3>
                 <p>Find the roots and graph the quadratic equation ax^2 + bx + c.</p>
                 <div class="form-group">
                     <label for="a-coefficient">Coefficient a</label>
