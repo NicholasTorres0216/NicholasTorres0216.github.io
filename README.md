@@ -148,6 +148,7 @@
         .form-group input[type="email"],
         .form-group input[type="tel"],
         .form-group input[type="date"],
+        .form-group input[type="number"],
         .form-group textarea,
         .form-group select {
             width: 100%;
@@ -219,7 +220,7 @@
             box-shadow: 0 0 5px rgba(217, 83, 79, 0.5);
         }
         
-        .submit-btn, .confirm-btn, .back-btn {
+        .submit-btn, .confirm-btn, .back-btn, .calculate-btn {
             display: block;
             width: 100%;
             padding: 1rem;
@@ -233,7 +234,7 @@
             transition: background-color 0.3s ease;
         }
         
-        .submit-btn:hover, .confirm-btn:hover, .back-btn:hover {
+        .submit-btn:hover, .confirm-btn:hover, .back-btn:hover, .calculate-btn:hover {
             background-color: #4a5568;
         }
         
@@ -260,6 +261,27 @@
 
         .confirmation-actions .confirm-btn, .confirmation-actions .back-btn {
             flex: 1;
+        }
+
+        .results-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }
+
+        .results-container h3 {
+            margin-top: 0;
+            color: #2f363d;
+        }
+
+        .results-container p {
+            margin-bottom: 0.5rem;
+        }
+
+        .results-container p strong {
+            color: #4a5568;
         }
 
         footer {
@@ -333,6 +355,7 @@
                     <li><a href="#" onclick="showPage('second-page')">Second Page</a></li>
                 </ul>
             </li>
+            <li><a href="#" onclick="showPage('projectile-motion-page')">Projectile Motion</a></li>
             <li><a href="#" onclick="showPage('form-page')">Contact Form</a></li>
         </ul>
     </nav>
@@ -348,6 +371,28 @@
         <section id="second-page" class="page-content">
             <div class="profile-section">
                 <p>Meeting the second page requirement.</p>
+            </div>
+        </section>
+
+        <section id="projectile-motion-page" class="page-content">
+            <div class="form-section">
+                <h2>Projectile Motion Calculator</h2>
+                <p>Calculate the range, maximum height, and time of flight for a projectile.</p>
+                <div class="form-group">
+                    <label for="initialVelocity">Initial Velocity ($v_0$) (m/s)</label>
+                    <input type="number" id="initialVelocity" placeholder="e.g., 20" required>
+                </div>
+                <div class="form-group">
+                    <label for="launchAngle">Launch Angle ($\theta$) (degrees)</label>
+                    <input type="number" id="launchAngle" placeholder="e.g., 45" required>
+                </div>
+                <button class="calculate-btn" onclick="calculateProjectileMotion()">Calculate</button>
+                <div id="results-container" class="results-container" style="display: none;">
+                    <h3>Results</h3>
+                    <p><strong>Time of Flight:</strong> <span id="timeOfFlight"></span> s</p>
+                    <p><strong>Maximum Height:</strong> <span id="maxHeight"></span> m</p>
+                    <p><strong>Horizontal Range:</strong> <span id="horizontalRange"></span> m</p>
+                </div>
             </div>
         </section>
 
@@ -646,5 +691,28 @@ ${formData.message}`;
             const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.location.href = mailtoLink;
         }
+
+        function calculateProjectileMotion() {
+            const initialVelocity = parseFloat(document.getElementById('initialVelocity').value);
+            const launchAngle = parseFloat(document.getElementById('launchAngle').value);
+            const gravity = 9.8;
+
+            if (isNaN(initialVelocity) || isNaN(launchAngle) || initialVelocity < 0 || launchAngle < 0 || launchAngle > 90) {
+                document.getElementById('results-container').style.display = 'none';
+                return;
+            }
+
+            const angleInRadians = launchAngle * (Math.PI / 180);
+
+            const timeOfFlight = (2 * initialVelocity * Math.sin(angleInRadians)) / gravity;
+
+            const maxHeight = (Math.pow(initialVelocity, 2) * Math.pow(Math.sin(angleInRadians), 2)) / (2 * gravity);
+
+            const horizontalRange = (Math.pow(initialVelocity, 2) * Math.sin(2 * angleInRadians)) / gravity;
+
+            document.getElementById('timeOfFlight').textContent = timeOfFlight.toFixed(2);
+            document.getElementById('maxHeight').textContent = maxHeight.toFixed(2);
+            document.getElementById('horizontalRange').textContent = horizontalRange.toFixed(2);
+            document.getElementById('results-container').style.display = 'block';
+        }
     </script>
-</body>
