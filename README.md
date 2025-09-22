@@ -198,18 +198,6 @@
             }
         }
         
-        .form-group .address-inputs.last-row {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .form-group .address-inputs.last-row input {
-            grid-column: span 1;
-        }
-
-        .form-group .address-inputs.last-row select {
-            grid-column: span 1;
-        }
-        
         .validation-message {
             color: #d9534f;
             font-size: 0.875rem;
@@ -537,7 +525,6 @@
         window.onload = function() {
             generateCaptcha();
             setupValidationListeners();
-            // Set canvas dimensions
             const canvas = document.getElementById('graph-canvas');
             canvas.width = 600;
             canvas.height = 400;
@@ -815,8 +802,8 @@ ${formData.message}`;
             const width = canvas.width;
             const height = canvas.height;
 
-            const xRange = 20; // x-axis from -10 to 10
-            const yRange = 500; // y-axis from -250 to 250 (adjustable)
+            const xRange = 20;
+            const yRange = 500;
 
             const xScale = width / xRange;
             const yScale = height / yRange;
@@ -826,7 +813,6 @@ ${formData.message}`;
 
             ctx.clearRect(0, 0, width, height);
 
-            // Draw grid lines
             ctx.strokeStyle = '#f0f0f0';
             ctx.lineWidth = 1;
 
@@ -843,7 +829,6 @@ ${formData.message}`;
                 ctx.stroke();
             }
 
-            // Draw axes
             ctx.beginPath();
             ctx.strokeStyle = '#999';
             ctx.lineWidth = 2;
@@ -853,7 +838,6 @@ ${formData.message}`;
             ctx.lineTo(originX, height);
             ctx.stroke();
 
-            // Draw axis labels
             ctx.font = '12px Arial';
             ctx.fillStyle = '#333';
             ctx.textAlign = 'center';
@@ -866,7 +850,6 @@ ${formData.message}`;
             }
             ctx.fillText('0', originX - 10, originY + 15);
 
-            // Draw quadratic function
             ctx.beginPath();
             ctx.strokeStyle = '#2f363d';
             ctx.lineWidth = 3;
@@ -887,7 +870,6 @@ ${formData.message}`;
                 ctx.stroke();
             }
 
-            // Draw data points
             ctx.fillStyle = '#d9534f';
             points.forEach(point => {
                 ctx.beginPath();
