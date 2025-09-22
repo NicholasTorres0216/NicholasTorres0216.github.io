@@ -815,30 +815,31 @@ ${formData.message}`;
             const width = canvas.width;
             const height = canvas.height;
 
-            const xMax = 10;
-            const yMax = Math.max(Math.abs(a * xMax * xMax + b * xMax + c), Math.abs(a * -xMax * -xMax + b * -xMax + c)) * 1.2;
-            
-            const xScale = width / (2 * xMax);
-            const yScale = height / (2 * yMax);
+            const xRange = 20; // x-axis from -10 to 10
+            const yRange = 500; // y-axis from -250 to 250 (adjustable)
+
+            const xScale = width / xRange;
+            const yScale = height / yRange;
 
             const originX = width / 2;
             const originY = height / 2;
 
             ctx.clearRect(0, 0, width, height);
-            
+
             // Draw grid lines
             ctx.strokeStyle = '#f0f0f0';
             ctx.lineWidth = 1;
-            for (let i = -xMax; i <= xMax; i++) {
+
+            for (let i = -xRange / 2; i <= xRange / 2; i += 1) {
                 ctx.beginPath();
                 ctx.moveTo(originX + i * xScale, 0);
                 ctx.lineTo(originX + i * xScale, height);
                 ctx.stroke();
             }
-            for (let i = -yMax; i <= yMax; i++) {
+            for (let i = -yRange / 2; i <= yRange / 2; i += 50) {
                 ctx.beginPath();
-                ctx.moveTo(0, originY + i * yScale);
-                ctx.lineTo(width, originY + i * yScale);
+                ctx.moveTo(0, originY - i * yScale);
+                ctx.lineTo(width, originY - i * yScale);
                 ctx.stroke();
             }
 
@@ -857,25 +858,41 @@ ${formData.message}`;
             ctx.fillStyle = '#333';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+            for (let i = -xRange / 2; i <= xRange / 2; i += 2) {
+                ctx.fillText(i, originX + i * xScale, originY + 15);
+            }
+            for (let i = -yRange / 2; i <= yRange / 2; i += 50) {
+                ctx.fillText(i, originX - 20, originY - i * yScale);
+            }
             ctx.fillText('0', originX - 10, originY + 15);
-            ctx.fillText('x', width - 15, originY + 15);
-            ctx.fillText('y', originX + 5, 15);
 
             // Draw quadratic function
             ctx.beginPath();
             ctx.strokeStyle = '#2f363d';
             ctx.lineWidth = 3;
-
+            
+            const points = [];
             for (let i = 0; i < width; i++) {
                 const x = (i - originX) / xScale;
                 const y = a * x * x + b * x + c;
                 const canvasY = originY - y * yScale;
-                if (i === 0) {
-                    ctx.moveTo(i, canvasY);
-                } else {
-                    ctx.lineTo(i, canvasY);
-                }
+                points.push({x: i, y: canvasY});
             }
-            ctx.stroke();
+
+            if (points.length > 0) {
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+            }
+
+            // Draw data points
+            ctx.fillStyle = '#d9534f';
+            points.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
+                ctx.fill();
+            });
         }
     </script>
