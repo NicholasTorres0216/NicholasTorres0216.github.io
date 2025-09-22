@@ -127,17 +127,14 @@
             margin: 0 auto;
         }
         
-        .form-section h2 {
+        .form-section h2, .form-section h3 {
             text-align: center;
             color: #2f363d;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .form-section h3 {
-            text-align: center;
-            color: #2f363d;
             margin-top: 2.5rem;
-            margin-bottom: 1rem;
         }
         
         .form-group {
@@ -297,6 +294,8 @@
             border: 1px solid #ccc;
             border-radius: 8px;
             overflow: hidden;
+            background-color: white;
+            position: relative;
         }
 
         #graph-container canvas {
@@ -401,11 +400,11 @@
                 <p>Calculate the range, maximum height, and time of flight for a projectile.</p>
                 <div class="form-group">
                     <label for="initialVelocity">Initial Velocity ($v_0$) (m/s)</label>
-                    <input type="number" id="initialVelocity" placeholder="e.g., 20" required>
+                    <input type="number" id="initialVelocity" placeholder="ex., 20" required>
                 </div>
                 <div class="form-group">
                     <label for="launchAngle">Launch Angle ($\theta$) (degrees)</label>
-                    <input type="number" id="launchAngle" placeholder="e.g., 45" required>
+                    <input type="number" id="launchAngle" placeholder="ex., 45" required>
                 </div>
                 <button class="calculate-btn" onclick="calculateProjectileMotion()">Calculate</button>
                 <div id="projectile-results-container" class="results-container" style="display: none;">
@@ -418,18 +417,18 @@
 
             <div class="form-section">
                 <h3>Quadratic Equation Calculator & Grapher</h3>
-                <p>Find the roots and graph the quadratic equation $ax^2 + bx + c = 0$.</p>
+                <p>Find the roots and graph the quadratic equation ax^2 + bx + c.</p>
                 <div class="form-group">
                     <label for="a-coefficient">Coefficient a</label>
-                    <input type="number" id="a-coefficient" placeholder="e.g., 1" required>
+                    <input type="number" id="a-coefficient" placeholder="ex., 1" required>
                 </div>
                 <div class="form-group">
                     <label for="b-coefficient">Coefficient b</label>
-                    <input type="number" id="b-coefficient" placeholder="e.g., -3" required>
+                    <input type="number" id="b-coefficient" placeholder="ex., -3" required>
                 </div>
                 <div class="form-group">
                     <label for="c-coefficient">Coefficient c</label>
-                    <input type="number" id="c-coefficient" placeholder="e.g., 2" required>
+                    <input type="number" id="c-coefficient" placeholder="ex., 2" required>
                 </div>
                 <button class="calculate-btn" onclick="calculateQuadratic()">Calculate & Graph</button>
                 <div id="quadratic-results" class="results-container" style="display: none;">
@@ -438,7 +437,7 @@
                     <p><strong>Vertex:</strong> (<span id="vertex-x"></span>, <span id="vertex-y"></span>)</p>
                 </div>
                 <div id="graph-container">
-                    <canvas id="graph-canvas"></canvas>
+                    <canvas id="graph-canvas" width="600" height="400"></canvas>
                 </div>
             </div>
         </section>
@@ -484,13 +483,13 @@
                     
                     <div class="form-group">
                         <label for="phone">Phone Number (US)</label>
-                        <input type="tel" id="phone" name="phone" placeholder="(000) 000-0000">
+                        <input type="tel" id="phone" name="phone" placeholder="ex., (000) 000-0000">
                         <span class="validation-message" id="phoneError"></span>
                     </div>
                     
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" placeholder="name@example.com">
+                        <input type="email" id="email" name="email" placeholder="ex., name@example.com">
                         <span class="validation-message" id="emailError"></span>
                     </div>
                     
@@ -538,6 +537,10 @@
         window.onload = function() {
             generateCaptcha();
             setupValidationListeners();
+            // Set canvas dimensions
+            const canvas = document.getElementById('graph-canvas');
+            canvas.width = 600;
+            canvas.height = 400;
         };
 
         function generateCaptcha() {
@@ -783,13 +786,10 @@ ${formData.message}`;
             const discriminant = b * b - 4 * a * c;
             let roots = '';
 
-            if (discriminant > 0) {
+            if (discriminant >= 0) {
                 const root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
                 const root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
                 roots = `${root1.toFixed(2)}, ${root2.toFixed(2)}`;
-            } else if (discriminant === 0) {
-                const root = -b / (2 * a);
-                roots = `${root.toFixed(2)}`;
             } else {
                 const realPart = (-b / (2 * a)).toFixed(2);
                 const imaginaryPart = (Math.sqrt(-discriminant) / (2 * a)).toFixed(2);
@@ -814,41 +814,66 @@ ${formData.message}`;
             const ctx = canvas.getContext('2d');
             const width = canvas.width;
             const height = canvas.height;
+
+            const xMax = 10;
+            const yMax = Math.max(Math.abs(a * xMax * xMax + b * xMax + c), Math.abs(a * -xMax * -xMax + b * -xMax + c)) * 1.2;
+            
+            const xScale = width / (2 * xMax);
+            const yScale = height / (2 * yMax);
+
             const originX = width / 2;
             const originY = height / 2;
 
             ctx.clearRect(0, 0, width, height);
-
-            ctx.beginPath();
-            ctx.strokeStyle = '#ccc';
+            
+            // Draw grid lines
+            ctx.strokeStyle = '#f0f0f0';
             ctx.lineWidth = 1;
+            for (let i = -xMax; i <= xMax; i++) {
+                ctx.beginPath();
+                ctx.moveTo(originX + i * xScale, 0);
+                ctx.lineTo(originX + i * xScale, height);
+                ctx.stroke();
+            }
+            for (let i = -yMax; i <= yMax; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, originY + i * yScale);
+                ctx.lineTo(width, originY + i * yScale);
+                ctx.stroke();
+            }
+
+            // Draw axes
+            ctx.beginPath();
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 2;
             ctx.moveTo(0, originY);
             ctx.lineTo(width, originY);
             ctx.moveTo(originX, 0);
             ctx.lineTo(originX, height);
             ctx.stroke();
 
+            // Draw axis labels
             ctx.font = '12px Arial';
             ctx.fillStyle = '#333';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
             ctx.fillText('0', originX - 10, originY + 15);
             ctx.fillText('x', width - 15, originY + 15);
             ctx.fillText('y', originX + 5, 15);
 
+            // Draw quadratic function
             ctx.beginPath();
             ctx.strokeStyle = '#2f363d';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
 
-            const scaleX = width / 20;
-            const scaleY = height / 20;
-
-            for (let x = -10; x <= 10; x += 0.1) {
+            for (let i = 0; i < width; i++) {
+                const x = (i - originX) / xScale;
                 const y = a * x * x + b * x + c;
-                const canvasX = originX + x * scaleX;
-                const canvasY = originY - y * scaleY;
-                if (x === -10) {
-                    ctx.moveTo(canvasX, canvasY);
+                const canvasY = originY - y * yScale;
+                if (i === 0) {
+                    ctx.moveTo(i, canvasY);
                 } else {
-                    ctx.lineTo(canvasX, canvasY);
+                    ctx.lineTo(i, canvasY);
                 }
             }
             ctx.stroke();
