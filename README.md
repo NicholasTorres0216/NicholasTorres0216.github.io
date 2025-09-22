@@ -132,6 +132,13 @@
             color: #2f363d;
             margin-bottom: 1.5rem;
         }
+
+        .form-section h3 {
+            text-align: center;
+            color: #2f363d;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
         
         .form-group {
             margin-bottom: 1.5rem;
@@ -284,6 +291,20 @@
             color: #4a5568;
         }
 
+        #graph-container {
+            margin-top: 20px;
+            display: none;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #graph-container canvas {
+            display: block;
+            width: 100%;
+            height: 400px;
+        }
+
         footer {
             text-align: center;
             padding: 1rem;
@@ -340,6 +361,7 @@
                     <li><a href="https://class.daytonastate.edu/d2l/le/content/487729/viewContent/7296115/View" target="_blank">Assignment 1</a></li>
                     <li><a href="https://class.daytonastate.edu/d2l/le/content/487729/viewContent/7296091/View" target="_blank">Assignment 2</a></li>
                     <li><a href="https://class.daytonastate.edu/d2l/le/content/487729/viewContent/7296092/View" target="_blank">Assignment 3</a></li>
+                    <li><a href="#" onclick="showPage('assignment-4-page')">Assignment 4</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -355,7 +377,6 @@
                     <li><a href="#" onclick="showPage('second-page')">Second Page</a></li>
                 </ul>
             </li>
-            <li><a href="#" onclick="showPage('projectile-motion-page')">Projectile Motion</a></li>
             <li><a href="#" onclick="showPage('form-page')">Contact Form</a></li>
         </ul>
     </nav>
@@ -373,8 +394,8 @@
                 <p>Meeting the second page requirement.</p>
             </div>
         </section>
-
-        <section id="projectile-motion-page" class="page-content">
+        
+        <section id="assignment-4-page" class="page-content">
             <div class="form-section">
                 <h2>Projectile Motion Calculator</h2>
                 <p>Calculate the range, maximum height, and time of flight for a projectile.</p>
@@ -387,11 +408,37 @@
                     <input type="number" id="launchAngle" placeholder="e.g., 45" required>
                 </div>
                 <button class="calculate-btn" onclick="calculateProjectileMotion()">Calculate</button>
-                <div id="results-container" class="results-container" style="display: none;">
+                <div id="projectile-results-container" class="results-container" style="display: none;">
                     <h3>Results</h3>
                     <p><strong>Time of Flight:</strong> <span id="timeOfFlight"></span> s</p>
                     <p><strong>Maximum Height:</strong> <span id="maxHeight"></span> m</p>
                     <p><strong>Horizontal Range:</strong> <span id="horizontalRange"></span> m</p>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Quadratic Equation Calculator & Grapher</h3>
+                <p>Find the roots and graph the quadratic equation $ax^2 + bx + c = 0$.</p>
+                <div class="form-group">
+                    <label for="a-coefficient">Coefficient a</label>
+                    <input type="number" id="a-coefficient" placeholder="e.g., 1" required>
+                </div>
+                <div class="form-group">
+                    <label for="b-coefficient">Coefficient b</label>
+                    <input type="number" id="b-coefficient" placeholder="e.g., -3" required>
+                </div>
+                <div class="form-group">
+                    <label for="c-coefficient">Coefficient c</label>
+                    <input type="number" id="c-coefficient" placeholder="e.g., 2" required>
+                </div>
+                <button class="calculate-btn" onclick="calculateQuadratic()">Calculate & Graph</button>
+                <div id="quadratic-results" class="results-container" style="display: none;">
+                    <h3>Results</h3>
+                    <p><strong>Roots:</strong> <span id="roots"></span></p>
+                    <p><strong>Vertex:</strong> (<span id="vertex-x"></span>, <span id="vertex-y"></span>)</p>
+                </div>
+                <div id="graph-container">
+                    <canvas id="graph-canvas"></canvas>
                 </div>
             </div>
         </section>
@@ -698,7 +745,7 @@ ${formData.message}`;
             const gravity = 9.8;
 
             if (isNaN(initialVelocity) || isNaN(launchAngle) || initialVelocity < 0 || launchAngle < 0 || launchAngle > 90) {
-                document.getElementById('results-container').style.display = 'none';
+                document.getElementById('projectile-results-container').style.display = 'none';
                 return;
             }
 
@@ -713,6 +760,97 @@ ${formData.message}`;
             document.getElementById('timeOfFlight').textContent = timeOfFlight.toFixed(2);
             document.getElementById('maxHeight').textContent = maxHeight.toFixed(2);
             document.getElementById('horizontalRange').textContent = horizontalRange.toFixed(2);
-            document.getElementById('results-container').style.display = 'block';
+            document.getElementById('projectile-results-container').style.display = 'block';
+        }
+
+        function calculateQuadratic() {
+            const a = parseFloat(document.getElementById('a-coefficient').value);
+            const b = parseFloat(document.getElementById('b-coefficient').value);
+            const c = parseFloat(document.getElementById('c-coefficient').value);
+            
+            const resultsContainer = document.getElementById('quadratic-results');
+            const graphContainer = document.getElementById('graph-container');
+            const rootsElement = document.getElementById('roots');
+            const vertexXElement = document.getElementById('vertex-x');
+            const vertexYElement = document.getElementById('vertex-y');
+
+            if (isNaN(a) || isNaN(b) || isNaN(c)) {
+                resultsContainer.style.display = 'none';
+                graphContainer.style.display = 'none';
+                return;
+            }
+
+            const discriminant = b * b - 4 * a * c;
+            let roots = '';
+
+            if (discriminant > 0) {
+                const root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+                const root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+                roots = `${root1.toFixed(2)}, ${root2.toFixed(2)}`;
+            } else if (discriminant === 0) {
+                const root = -b / (2 * a);
+                roots = `${root.toFixed(2)}`;
+            } else {
+                const realPart = (-b / (2 * a)).toFixed(2);
+                const imaginaryPart = (Math.sqrt(-discriminant) / (2 * a)).toFixed(2);
+                roots = `${realPart} + ${imaginaryPart}i, ${realPart} - ${imaginaryPart}i`;
+            }
+
+            const vertexX = -b / (2 * a);
+            const vertexY = a * vertexX * vertexX + b * vertexX + c;
+
+            rootsElement.textContent = roots;
+            vertexXElement.textContent = vertexX.toFixed(2);
+            vertexYElement.textContent = vertexY.toFixed(2);
+
+            resultsContainer.style.display = 'block';
+            graphContainer.style.display = 'block';
+            
+            drawQuadraticGraph(a, b, c);
+        }
+
+        function drawQuadraticGraph(a, b, c) {
+            const canvas = document.getElementById('graph-canvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const originX = width / 2;
+            const originY = height / 2;
+
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            ctx.moveTo(0, originY);
+            ctx.lineTo(width, originY);
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, height);
+            ctx.stroke();
+
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#333';
+            ctx.fillText('0', originX - 10, originY + 15);
+            ctx.fillText('x', width - 15, originY + 15);
+            ctx.fillText('y', originX + 5, 15);
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#2f363d';
+            ctx.lineWidth = 2;
+
+            const scaleX = width / 20;
+            const scaleY = height / 20;
+
+            for (let x = -10; x <= 10; x += 0.1) {
+                const y = a * x * x + b * x + c;
+                const canvasX = originX + x * scaleX;
+                const canvasY = originY - y * scaleY;
+                if (x === -10) {
+                    ctx.moveTo(canvasX, canvasY);
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            }
+            ctx.stroke();
         }
     </script>
