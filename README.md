@@ -185,7 +185,7 @@
         .form-group .name-inputs > div {
             flex: 1;
         }
-        
+
         .form-group .address-inputs {
             display: grid;
             grid-template-columns: 1fr;
@@ -387,11 +387,11 @@
                 <h2>Projectile Motion Calculator</h2>
                 <p>Calculate the range, maximum height, and time of flight for a projectile.</p>
                 <div class="form-group">
-                    <label for="initialVelocity">Initial Velocity ($v_0$) (m/s)</label>
+                    <label for="initialVelocity">Initial Velocity (m/s)</label>
                     <input type="number" id="initialVelocity" placeholder="ex., 20" required>
                 </div>
                 <div class="form-group">
-                    <label for="launchAngle">Launch Angle ($\theta$) (degrees)</label>
+                    <label for="launchAngle">Launch Angle (degrees)</label>
                     <input type="number" id="launchAngle" placeholder="ex., 45" required>
                 </div>
                 <button class="calculate-btn" onclick="calculateProjectileMotion()">Calculate</button>
