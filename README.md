@@ -3,7 +3,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nicholas Torres - Web Systems</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -471,7 +470,7 @@
                 </div>
 
                 <div id="spirograph-container">
-                    <canvas id="spirograph-canvas" width="400" height="400" style="border: 1px solid #ccc;"></canvas>
+                    <canvas id="spirograph-canvas" width="600" height="600"></canvas>
                 </div>
             </div>
         </section>
@@ -579,8 +578,8 @@
             canvas.width = 600;
             canvas.height = 400;
             const spiroCanvas = document.getElementById('spirograph-canvas');
-            spiroCanvas.width = 400;
-            spiroCanvas.height = 400;
+            spiroCanvas.width = 600; 
+            spiroCanvas.height = 600;
         };
 
         function generateCaptcha() {
@@ -1043,8 +1042,8 @@ ${formData.message}`;
             let R, r, O;
 
             if (isRandom) {
-                R = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
-                r = Math.floor(Math.random() * (R - 10 - 1 + 1)) + 1;
+                R = Math.floor(Math.random() * (250 - 100 + 1)) + 100;
+                r = Math.floor(Math.random() * (R - 20 - 1 + 1)) + 10; 
                 O = Math.floor(Math.random() * (r - 1 + 1));
                 document.getElementById('spiroR').value = R;
                 document.getElementById('spiro_r').value = r;
@@ -1058,9 +1057,9 @@ ${formData.message}`;
 
             } else {
                 let isValid = true;
-                isValid = validateSpiroParam('spiroR', 10, 200, 'spiroRError') && isValid;
-                isValid = validateSpiroParam('spiro_r', 1, 190, 'spiro_rError') && isValid;
-                isValid = validateSpiroParam('spiroO', 0, 100, 'spiroOError') && isValid;
+                isValid = validateSpiroParam('spiroR', 10, 250, 'spiroRError') && isValid;
+                isValid = validateSpiroParam('spiro_r', 1, 240, 'spiro_rError') && isValid;
+                isValid = validateSpiroParam('spiroO', 0, 150, 'spiroOError') && isValid;
 
                 if (!isValid) {
                     return;
@@ -1132,5 +1131,3 @@ ${formData.message}`;
             }
         }
     </script>
-</body>
-</html>
