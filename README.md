@@ -1,9 +1,11 @@
+<!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nicholas Torres - Web Systems</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -291,6 +293,21 @@
             width: 100%;
             height: 400px;
         }
+        
+        #spirograph-container {
+            margin-top: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background-color: white; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        #spirograph-canvas {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
 
         footer {
             text-align: center;
@@ -349,6 +366,7 @@
                     <li><a href="https://class.daytonastate.edu/d2l/le/content/487729/viewContent/7296091/View" target="_blank">Assignment 2</a></li>
                     <li><a href="https://class.daytonastate.edu/d2l/le/content/487729/viewContent/7296092/View" target="_blank">Assignment 3</a></li>
                     <li><a href="#" onclick="showPage('assignment-4-page')">Assignment 4</a></li>
+                    <li><a href="#" onclick="showPage('spirograph-page')">Assignment 5</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -384,7 +402,7 @@
         
         <section id="assignment-4-page" class="page-content">
             <div class="form-section">
-                <h2>Projectile Motion Calculator</h2>
+                <h2>Projectile Motion Calculator </h2>
                 <p>Calculate the range, maximum height, and time of flight for a projectile.</p>
                 <div class="form-group">
                     <label for="initialVelocity">Initial Velocity (m/s)</label>
@@ -426,6 +444,36 @@
                 </div>
                 <div id="graph-container">
                     <canvas id="graph-canvas" width="600" height="400"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="spirograph-page" class="page-content">
+            <div class="form-section">
+                <h2>Spirograph Generator</h2>
+                <p>Enter parameters or click "Draw Random" to generate a Spirograph.</p>
+                <div class="form-group">
+                    <label for="spiroR">Outer Circle Radius (R)</label>
+                    <input type="number" id="spiroR" value="100" min="10" max="200">
+                    <span class="validation-message" id="spiroRError">R should be between 10 and 200.</span>
+                </div>
+                <div class="form-group">
+                    <label for="spiro_r">Inner Circle Radius (r)</label>
+                    <input type="number" id="spiro_r" value="70" min="1" max="190">
+                    <span class="validation-message" id="spiro_rError">r should be between 1 and 190.</span>
+                </div>
+                <div class="form-group">
+                    <label for="spiroO">Pen Offset (O)</label>
+                    <input type="number" id="spiroO" value="50" min="0" max="100">
+                    <span class="validation-message" id="spiroOError">O should be between 0 and 100.</span>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button class="calculate-btn" onclick="drawSpirograph(true)" style="flex: 1;">Draw Random Spirograph</button>
+                    <button class="calculate-btn" onclick="drawSpirograph(false)" style="flex: 1;">Draw Custom Spirograph</button>
+                </div>
+
+                <div id="spirograph-container">
+                    <canvas id="spirograph-canvas" width="400" height="400" style="border: 1px solid #ccc;"></canvas>
                 </div>
             </div>
         </section>
@@ -504,7 +552,7 @@
             </div>
             
             <div id="confirmation-container" class="form-section" style="display: none;">
-                <h2>Confirm Your Information</h2>
+                <h2>Confirm Your Information </h2>
                 <div id="confirmation-details"></div>
                 <div class="confirmation-actions">
                     <button class="back-btn" onclick="showForm()">Go Back to Form</button>
@@ -521,6 +569,10 @@
     <script>
         let captchaResult;
         let formData = {};
+        let animationFrameId;
+        let currentSpiroT = 0;
+        let spiroParams = { R: 0, r: 0, O: 0, steps: 0, maxT: 0 };
+        const drawingSpeed = 0.1;
 
         window.onload = function() {
             generateCaptcha();
@@ -528,6 +580,9 @@
             const canvas = document.getElementById('graph-canvas');
             canvas.width = 600;
             canvas.height = 400;
+            const spiroCanvas = document.getElementById('spirograph-canvas');
+            spiroCanvas.width = 400;
+            spiroCanvas.height = 400;
         };
 
         function generateCaptcha() {
@@ -546,6 +601,12 @@
 
             document.getElementById(pageId).classList.add('active');
             
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+                currentSpiroT = 0;
+            }
+
             if (pageId === 'form-page') {
                 generateCaptcha();
                 showForm();
@@ -711,6 +772,37 @@
             
             const captchaInput = document.getElementById('captcha');
             captchaInput.addEventListener('input', () => validateField(captchaInput));
+
+            const spiroInputs = ['spiroR', 'spiro_r', 'spiroO'];
+            spiroInputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('blur', () => {
+                        let R_val = parseFloat(document.getElementById('spiroR').value);
+                        let r_val = parseFloat(document.getElementById('spiro_r').value);
+
+                        if (id === 'spiroR') {
+                           validateSpiroParam('spiroR', 10, 200, 'spiroRError');
+                        } else if (id === 'spiro_r') {
+                           if (!validateSpiroParam('spiro_r', 1, 190, 'spiro_rError')) return;
+                           if (r_val >= R_val && !isNaN(R_val)) {
+                               document.getElementById('spiro_rError').textContent = 'Inner radius (r) must be less than Outer radius (R).';
+                               document.getElementById('spiro_rError').style.display = 'block';
+                               input.closest('.form-group').classList.add('invalid');
+                           } else {
+                               document.getElementById('spiro_rError').style.display = 'none';
+                               input.closest('.form-group').classList.remove('invalid');
+                           }
+                        } else if (id === 'spiroO') {
+                           validateSpiroParam('spiroO', 0, 100, 'spiroOError');
+                        }
+                    });
+                     input.addEventListener('input', () => {
+                         document.getElementById(id + 'Error').style.display = 'none';
+                         input.closest('.form-group').classList.remove('invalid');
+                     });
+                }
+            });
         }
 
         function sendEmail() {
@@ -802,79 +894,245 @@ ${formData.message}`;
             const width = canvas.width;
             const height = canvas.height;
 
+            ctx.clearRect(0, 0, width, height);
+
+            const vertexX = -b / (2 * a);
+            const vertexY = a * vertexX * vertexX + b * vertexX + c;
+
             const xRange = 20;
-            const yRange = 500;
+            const xMin = vertexX - (xRange / 2);
+            const xMax = vertexX + (xRange / 2);
+            
+            const yAtMin = a * xMin * xMin + b * xMin + c;
+            const yAtMax = a * xMax * xMax + b * xMax + c;
+            const yIntercept = c;
+
+            const yValues = [yAtMin, yAtMax, vertexY, yIntercept];
+            const yMin = Math.min(...yValues) - 5;
+            const yMax = Math.max(...yValues) + 5;
+            const yRange = yMax - yMin;
 
             const xScale = width / xRange;
             const yScale = height / yRange;
 
-            const originX = width / 2;
-            const originY = height / 2;
-
-            ctx.clearRect(0, 0, width, height);
+            const originX = -xMin * xScale;
+            const originY = height + yMin * yScale;
 
             ctx.strokeStyle = '#f0f0f0';
             ctx.lineWidth = 1;
 
-            for (let i = -xRange / 2; i <= xRange / 2; i += 1) {
-                ctx.beginPath();
-                ctx.moveTo(originX + i * xScale, 0);
-                ctx.lineTo(originX + i * xScale, height);
-                ctx.stroke();
+            for (let i = Math.ceil(xMin); i <= Math.floor(xMax); i += 1) {
+                if (i !== 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(originX + i * xScale, 0);
+                    ctx.lineTo(originX + i * xScale, height);
+                    ctx.stroke();
+                }
             }
-            for (let i = -yRange / 2; i <= yRange / 2; i += 50) {
-                ctx.beginPath();
-                ctx.moveTo(0, originY - i * yScale);
-                ctx.lineTo(width, originY - i * yScale);
-                ctx.stroke();
+            const yStep = yRange > 20 ? 5 : 1;
+            for (let i = Math.ceil(yMin); i <= Math.floor(yMax); i += yStep) {
+                if (i !== 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, originY - i * yScale);
+                    ctx.lineTo(width, originY - i * yScale);
+                    ctx.stroke();
+                }
             }
 
-            ctx.beginPath();
-            ctx.strokeStyle = '#999';
+            ctx.strokeStyle = '#333';
             ctx.lineWidth = 2;
-            ctx.moveTo(0, originY);
-            ctx.lineTo(width, originY);
-            ctx.moveTo(originX, 0);
-            ctx.lineTo(originX, height);
-            ctx.stroke();
-
-            ctx.font = '12px Arial';
+            ctx.font = '10px Roboto';
             ctx.fillStyle = '#333';
             ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            for (let i = -xRange / 2; i <= xRange / 2; i += 2) {
-                ctx.fillText(i, originX + i * xScale, originY + 15);
-            }
-            for (let i = -yRange / 2; i <= yRange / 2; i += 50) {
-                ctx.fillText(i, originX - 20, originY - i * yScale);
-            }
-            ctx.fillText('0', originX - 10, originY + 15);
+            ctx.textBaseline = 'top';
 
+            if (originY > 0 && originY < height) {
+                ctx.beginPath();
+                ctx.moveTo(0, originY);
+                ctx.lineTo(width, originY);
+                ctx.stroke();
+                for (let i = Math.ceil(xMin); i <= Math.floor(xMax); i += 1) {
+                    if (i !== 0) {
+                        ctx.fillText(i, originX + i * xScale, originY + 5);
+                    }
+                }
+            } else {
+                const labelY = originY > height ? height - 15 : 5;
+                for (let i = Math.ceil(xMin); i <= Math.floor(xMax); i += 2) {
+                    ctx.fillText(i, originX + i * xScale, labelY);
+                }
+            }
+
+            if (originX > 0 && originX < width) {
+                ctx.beginPath();
+                ctx.moveTo(originX, 0);
+                ctx.lineTo(originX, height);
+                ctx.stroke();
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                for (let i = Math.ceil(yMin); i <= Math.floor(yMax); i += yStep) {
+                    if (i !== 0) {
+                        ctx.fillText(i, originX - 5, originY - i * yScale);
+                    }
+                }
+            } else {
+                const labelX = originX > width ? width - 5 : 5;
+                ctx.textAlign = originX > width ? 'right' : 'left';
+                ctx.textBaseline = 'middle';
+                for (let i = Math.ceil(yMin); i <= Math.floor(yMax); i += yStep) {
+                    ctx.fillText(i, labelX, originY - i * yScale);
+                }
+            }
+
+            ctx.textAlign = originX < 15 ? 'left' : 'center';
+            ctx.textBaseline = originY < 15 ? 'top' : 'bottom';
+            ctx.fillText('0', originX + (originX < 15 ? 2 : 0), originY + (originY < 15 ? 2 : -2));
+
+
+            ctx.strokeStyle = '#d9534f';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            let firstPoint = true;
+            for (let px = 0; px <= width; px++) {
+                const x = xMin + (px / xScale); 
+                const y = a * x * x + b * x + c;
+                const py = originY - y * yScale;
+
+                if (py >= -1000 && py <= height + 1000) {
+                    if (firstPoint) {
+                        ctx.moveTo(px, py);
+                        firstPoint = false;
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+            }
+
+            ctx.stroke();
+        }
+
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
+        }
+
+        function validateSpiroParam(id, min, max, errorMessageId) {
+            const input = document.getElementById(id);
+            const value = parseFloat(input.value);
+            const errorElement = document.getElementById(errorMessageId);
+            if (isNaN(value) || value < min || value > max) {
+                errorElement.style.display = 'block';
+                input.closest('.form-group').classList.add('invalid');
+                return false;
+            } else {
+                errorElement.style.display = 'none';
+                input.closest('.form-group').classList.remove('invalid');
+                return true;
+            }
+        }
+
+        function drawSpirograph(isRandom) {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+                currentSpiroT = 0;
+            }
+
+            const canvas = document.getElementById('spirograph-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let R, r, O;
+
+            if (isRandom) {
+                R = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
+                r = Math.floor(Math.random() * (R - 10 - 1 + 1)) + 1;
+                O = Math.floor(Math.random() * (r - 1 + 1));
+                document.getElementById('spiroR').value = R;
+                document.getElementById('spiro_r').value = r;
+                document.getElementById('spiroO').value = O;
+                document.getElementById('spiroRError').style.display = 'none';
+                document.getElementById('spiro_rError').style.display = 'none';
+                document.getElementById('spiroOError').style.display = 'none';
+                document.getElementById('spiroR').closest('.form-group').classList.remove('invalid');
+                document.getElementById('spiro_r').closest('.form-group').classList.remove('invalid');
+                document.getElementById('spiroO').closest('.form-group').classList.remove('invalid');
+
+            } else {
+                let isValid = true;
+                isValid = validateSpiroParam('spiroR', 10, 200, 'spiroRError') && isValid;
+                isValid = validateSpiroParam('spiro_r', 1, 190, 'spiro_rError') && isValid;
+                isValid = validateSpiroParam('spiroO', 0, 100, 'spiroOError') && isValid;
+
+                if (!isValid) {
+                    return;
+                }
+
+                R = parseFloat(document.getElementById('spiroR').value);
+                r = parseFloat(document.getElementById('spiro_r').value);
+                O = parseFloat(document.getElementById('spiroO').value);
+
+                if (r >= R) {
+                    document.getElementById('spiro_rError').textContent = 'Inner radius (r) must be less than Outer radius (R).';
+                    document.getElementById('spiro_rError').style.display = 'block';
+                    document.getElementById('spiro_r').closest('.form-group').classList.add('invalid');
+                    return;
+                } else {
+                     document.getElementById('spiro_rError').style.display = 'none';
+                     document.getElementById('spiro_r').closest('.form-group').classList.remove('invalid');
+                }
+            }
+            
+            const k = gcd(R, r);
+            const maxT = (2 * Math.PI * r) / k;
+
+            spiroParams = { R, r, O, maxT };
+            currentSpiroT = 0;
             ctx.beginPath();
             ctx.strokeStyle = '#2f363d';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 1.5;
+
+            const initialX = (R + r) * Math.cos(0) - (r + O) * Math.cos(((R + r) / r) * 0);
+            const initialY = (R + r) * Math.sin(0) - (r + O) * Math.sin(((R + r) / r) * 0);
             
-            const points = [];
-            for (let i = 0; i < width; i++) {
-                const x = (i - originX) / xScale;
-                const y = a * x * x + b * x + c;
-                const canvasY = originY - y * yScale;
-                points.push({x: i, y: canvasY});
-            }
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
 
-            if (points.length > 0) {
-                ctx.moveTo(points[0].x, points[0].y);
-                for (let i = 1; i < points.length; i++) {
-                    ctx.lineTo(points[i].x, points[i].y);
+            ctx.moveTo(centerX + initialX, centerY + initialY);
+
+            animateSpirograph();
+        }
+
+        function animateSpirograph() {
+            const canvas = document.getElementById('spirograph-canvas');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const { R, r, O, maxT } = spiroParams;
+
+            let t = currentSpiroT;
+            let pathCompleted = false;
+
+            for (let i = 0; i < 5; i++) {
+                if (t >= maxT) {
+                    pathCompleted = true;
+                    break;
                 }
-                ctx.stroke();
-            }
 
-            ctx.fillStyle = '#d9534f';
-            points.forEach(point => {
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
-                ctx.fill();
-            });
+                const x = (R + r) * Math.cos(t) - (r + O) * Math.cos(((R + r) / r) * t);
+                const y = (R + r) * Math.sin(t) - (r + O) * Math.sin(((R + r) / r) * t);
+                ctx.lineTo(centerX + x, centerY + y);
+                t += drawingSpeed;
+            }
+            ctx.stroke();
+            currentSpiroT = t;
+
+            if (!pathCompleted) {
+                animationFrameId = requestAnimationFrame(animateSpirograph);
+            } else {
+                animationFrameId = null;
+            }
         }
     </script>
+</body>
+</html>
