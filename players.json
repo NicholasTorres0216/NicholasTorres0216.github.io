@@ -1,0 +1,34 @@
+{
+    "teamName": "UCF Knights Football",
+    "season": "Fall 2025",
+    "data": [
+        {
+            "playerNumber": 10,
+            "playerName": "Mikey Keene",
+            "position": "Quarterback",
+            "passingYards": 3500,
+            "touchdowns": 28
+        },
+        {
+            "playerNumber": 2,
+            "playerName": "RJ Harvey",
+            "position": "Running Back",
+            "rushingYards": 1250,
+            "rushingTouchdowns": 14
+        },
+        {
+            "playerNumber": 8,
+            "playerName": "Javon Baker",
+            "position": "Wide Receiver",
+            "receptions": 75,
+            "receivingYards": 1050
+        },
+        {
+            "playerNumber": 42,
+            "playerName": "Jason Johnson",
+            "position": "Linebacker",
+            "tackles": 110,
+            "sacks": 5.5
+        }
+    ]
+}
