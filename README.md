@@ -4,6 +4,9 @@
     <title>Nicholas Torres - Web Systems</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -275,6 +278,37 @@
             color: #4a5568;
         }
 
+        #player-data-container {
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        #player-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        #player-data-table th, #player-data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #player-data-table th {
+            background-color: #2f363d;
+            color: white;
+            font-weight: 700;
+        }
+
+        #player-data-table tr:nth-child(even) {
+            background-color: #f4f4f4;
+        }
+
+        #player-data-table tr:hover {
+            background-color: #e8e8e8;
+        }
+
         #graph-container {
             margin-top: 20px;
             display: none;
@@ -364,6 +398,7 @@
                     <li><a href="https://class.daytonastate.edu/d2l/le/content/487729/viewContent/7296092/View" target="_blank">Assignment 3</a></li>
                     <li><a href="#" onclick="showPage('assignment-4-page')">Assignment 4</a></li>
                     <li><a href="#" onclick="showPage('spirograph-page')">Assignment 5</a></li>
+                    <li><a href="#" onclick="showPage('assignment-6-page')">Assignment 6</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -451,18 +486,18 @@
                 <p>Enter parameters or click "Draw Random" to generate a Spirograph.</p>
                 <div class="form-group">
                     <label for="spiroR">Outer Circle Radius (R)</label>
-                    <input type="number" id="spiroR" value="100" min="10" max="200">
-                    <span class="validation-message" id="spiroRError">R should be between 10 and 200.</span>
+                    <input type="number" id="spiroR" value="100" min="10" max="250">
+                    <span class="validation-message" id="spiroRError">R should be between 10 and 250.</span>
                 </div>
                 <div class="form-group">
                     <label for="spiro_r">Inner Circle Radius (r)</label>
-                    <input type="number" id="spiro_r" value="70" min="1" max="190">
-                    <span class="validation-message" id="spiro_rError">r should be between 1 and 190.</span>
+                    <input type="number" id="spiro_r" value="70" min="1" max="240">
+                    <span class="validation-message" id="spiro_rError">r should be between 1 and 240.</span>
                 </div>
                 <div class="form-group">
                     <label for="spiroO">Pen Offset (O)</label>
-                    <input type="number" id="spiroO" value="50" min="0" max="100">
-                    <span class="validation-message" id="spiroOError">O should be between 0 and 100.</span>
+                    <input type="number" id="spiroO" value="50" min="0" max="150">
+                    <span class="validation-message" id="spiroOError">O should be between 0 and 150.</span>
                 </div>
                 <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                     <button class="calculate-btn" onclick="drawSpirograph(true)" style="flex: 1;">Draw Random Spirograph</button>
@@ -472,6 +507,20 @@
                 <div id="spirograph-container">
                     <canvas id="spirograph-canvas" width="600" height="600"></canvas>
                 </div>
+            </div>
+        </section>
+        
+        <section id="assignment-6-page" class="page-content">
+            <div class="form-section" style="max-width: 800px;">
+                <h2 id="team-title">Loading Team Data...</h2>
+                <p id="team-info" style="text-align: center; font-style: italic;"></p>
+                
+                <div id="player-data-container">
+                </div>
+
+                <p style="text-align: center; margin-top: 2rem;">
+                    <em>This data is loaded dynamically from the external **players.json** file using jQuery/AJAX.</em>
+                </p>
             </div>
         </section>
 
@@ -607,6 +656,10 @@
             if (pageId === 'form-page') {
                 generateCaptcha();
                 showForm();
+            }
+            
+            if (pageId === 'assignment-6-page') {
+                loadPlayerData();
             }
         }
 
@@ -779,9 +832,9 @@
                         let r_val = parseFloat(document.getElementById('spiro_r').value);
 
                         if (id === 'spiroR') {
-                           validateSpiroParam('spiroR', 10, 200, 'spiroRError');
+                           validateSpiroParam('spiroR', 10, 250, 'spiroRError');
                         } else if (id === 'spiro_r') {
-                           if (!validateSpiroParam('spiro_r', 1, 190, 'spiro_rError')) return;
+                           if (!validateSpiroParam('spiro_r', 1, 240, 'spiro_rError')) return;
                            if (r_val >= R_val && !isNaN(R_val)) {
                                document.getElementById('spiro_rError').textContent = 'Inner radius (r) must be less than Outer radius (R).';
                                document.getElementById('spiro_rError').style.display = 'block';
@@ -791,7 +844,7 @@
                                input.closest('.form-group').classList.remove('invalid');
                            }
                         } else if (id === 'spiroO') {
-                           validateSpiroParam('spiroO', 0, 100, 'spiroOError');
+                           validateSpiroParam('spiroO', 0, 150, 'spiroOError');
                         }
                     });
                      input.addEventListener('input', () => {
@@ -1129,5 +1182,46 @@ ${formData.message}`;
             } else {
                 animationFrameId = null;
             }
+        }
+        
+        function loadPlayerData() {
+            
+            $.getJSON('players.json', function(data) {
+                $('#team-title').text(data.teamName + ' Player Statistics');
+                $('#team-info').html('**Season:** ' + data.season);
+
+                let tableHTML = '<table id="player-data-table"><thead><tr>';
+                
+                
+                if (data.data.length > 0) {
+                    const headers = Object.keys(data.data[0]);
+                    headers.forEach(function(header) {
+                        
+                        const cleanHeader = header.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                        tableHTML += '<th>' + cleanHeader + '</th>';
+                    });
+                }
+                tableHTML += '</tr></thead><tbody>';
+
+                
+                data.data.forEach(function(player) {
+                    tableHTML += '<tr>';
+                    for (const key in player) {
+                        tableHTML += '<td>' + player[key] + '</td>';
+                    }
+                    tableHTML += '</tr>';
+                });
+
+                tableHTML += '</tbody></table>';
+                
+                
+                $('#player-data-container').html(tableHTML);
+
+            }).fail(function(jqxhr, textStatus, error) {
+                
+                const err = textStatus + ", " + error;
+                $('#team-title').text('Error Loading Data');
+                $('#team-info').html('<p style="color: red;">Could not load players.json: ' + err + '. Please ensure the file exists and is valid JSON and that the JSON file is in the same directory as this HTML file.</p>');
+            });
         }
     </script>
