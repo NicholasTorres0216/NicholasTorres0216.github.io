@@ -517,10 +517,6 @@
                 
                 <div id="player-data-container">
                 </div>
-
-                <p style="text-align: center; margin-top: 2rem;">
-                    <em>This data is loaded dynamically from the external **players.json** file using jQuery/AJAX.</em>
-                </p>
             </div>
         </section>
 
