@@ -1328,131 +1328,155 @@ ${formData.message}`;
 
         /* --- Assignment 7 Functions: Drag and Drop Card Game --- */
 
-        function loadAndRenderCardHand() {
-            // Use jQuery's getJSON to load the local JSON file
-            $.getJSON('card_images.json', function(data) {
-                if (data && data.cardHandImages) {
-                    renderCardHand(data.cardHandImages);
-                } else {
-                    $('#card-load-status').text('Error: JSON data is missing "cardHandImages" array.');
-                }
-            }).fail(function(jqxhr, textStatus, error) {
-                const err = textStatus + ", " + error;
-                $('#card-load-status').html('Error loading card_images.json: ' + err + '. Please ensure the file exists and is in the same directory.');
-            });
+function addRandomCardToHand() {
+    const handContainer = document.getElementById('card-hand-container');
+    
+    const availableCards = [
+        "2_of_clubs.png", "3_of_diamonds.png", "4_of_hearts.png", "5_of_spades.png", 
+        "6_of_clubs.png", "7_of_diamonds.png", "8_of_hearts.png", "9_of_spades.png", 
+        "jack_of_clubs.png", "queen_of_diamonds.png", "king_of_spades.png", "ace_of_hearts",
+    ];
+
+    const randomIndex = Math.floor(Math.random() * availableCards.length);
+    const newFileName = availableCards[randomIndex];
+    const newID = 'card' + Date.now();
+    const newAltText = newFileName.replace(/_/g, ' ').replace('.png', '');
+
+    const cardElement = document.createElement('div');
+    cardElement.classList.add('card');
+    cardElement.setAttribute('draggable', true);
+    cardElement.id = newID;
+
+    const imgElement = document.createElement('img');
+    imgElement.src = CARD_IMAGE_PATH + newFileName;
+    imgElement.alt = newAltText;
+
+    cardElement.appendChild(imgElement);
+    
+    handContainer.appendChild(cardElement);
+    
+    cardElement.addEventListener('dragstart', dragstart);
+    cardElement.addEventListener('dragend', dragend);
+}
+
+
+function loadAndRenderCardHand() {
+    $.getJSON('card_images.json', function(data) {
+        if (data && data.cardHandImages) {
+            renderCardHand(data.cardHandImages);
+        } else {
+            $('#card-load-status').text('Error: JSON data is missing "cardHandImages" array.');
         }
+    }).fail(function(jqxhr, textStatus, error) {
+        const err = textStatus + ", " + error;
+        $('#card-load-status').html('Error loading card_images.json: ' + err + '. Please ensure the file exists, is in the same directory, AND you are using a local web server (like Live Server).');
+    });
+}
 
-        function renderCardHand(cardData) {
-            const handContainer = $('#card-hand-container');
-            handContainer.empty(); // Clear "Loading cards..." message and previous cards
+function renderCardHand(cardData) {
+    const handContainer = $('#card-hand-container');
+    handContainer.empty();
 
-            cardData.forEach(function(card) {
-                const cardElement = $('<div>')
-                    .addClass('card')
-                    .attr('draggable', true)
-                    .attr('id', card.id)
-                    .html(`<img src="${CARD_IMAGE_PATH}${card.fileName}" alt="${card.altText}">`);
-                
-                handContainer.append(cardElement);
-            });
+    cardData.forEach(function(card) {
+        const cardElement = $('<div>')
+            .addClass('card')
+            .attr('draggable', true)
+            .attr('id', card.id)
+            .html(`<img src="${CARD_IMAGE_PATH}${card.fileName}" alt="${card.altText}">`);
+        
+        handContainer.append(cardElement);
+    });
 
-            // After rendering, set up the drag-and-drop functionality
-            setupDragAndDrop();
+    setupDragAndDrop();
+}
+
+function setupDragAndDrop() {
+    const cards = document.querySelectorAll('#card-hand-container .card');
+    const dropZone = document.getElementById('card-drop-zone');
+    const handContainer = document.getElementById('card-hand-container');
+    
+    cards.forEach(card => {
+        card.removeEventListener('dragstart', dragstart);
+        card.removeEventListener('dragend', dragend);
+        card.addEventListener('dragstart', dragstart);
+        card.addEventListener('dragend', dragend);
+    });
+
+    dropZone.removeEventListener('dragover', dragover);
+    dropZone.removeEventListener('drop', drop);
+    handContainer.removeEventListener('drop', drop);
+
+    dropZone.addEventListener('dragover', dragover);
+    dropZone.addEventListener('dragenter', dragenter);
+    dropZone.addEventListener('dragleave', dragleave);
+    dropZone.addEventListener('drop', drop);
+    handContainer.addEventListener('dragover', dragover);
+    handContainer.addEventListener('dragenter', dragenter);
+    handContainer.addEventListener('dragleave', dragleave);
+    handContainer.addEventListener('drop', drop);
+}
+
+function dragstart(e) {
+    e.dataTransfer.setData('text/plain', e.target.id);
+    setTimeout(() => e.target.classList.add('dragging'), 0);
+}
+
+function dragend(e) {
+    e.target.classList.remove('dragging');
+}
+
+function dragover(e) {
+    e.preventDefault();
+}
+
+function dragenter(e) {
+    if (e.target.classList.contains('drop-zone')) {
+        e.target.classList.add('drag-over');
+    } else if (e.target.id === 'card-hand-container') {
+        e.target.classList.add('drag-over');
+    }
+}
+
+function dragleave(e) {
+    if (e.target.classList.contains('drop-zone')) {
+        e.target.classList.remove('drag-over');
+    } else if (e.target.id === 'card-hand-container') {
+        e.target.classList.remove('drag-over');
+    }
+}
+
+function drop(e) {
+    e.preventDefault();
+    const cardId = e.dataTransfer.getData('text/plain');
+    const draggedCard = document.getElementById(cardId);
+    const dropZone = document.getElementById('card-drop-zone');
+    const handContainer = document.getElementById('card-hand-container');
+    const dropZoneContent = dropZone.querySelector('.drop-zone-content');
+
+    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+
+    const targetIsDropZone = e.target.closest('#card-drop-zone');
+
+    if (targetIsDropZone) {
+        
+        const existingCard = dropZone.querySelector('.card');
+        if (existingCard) {
+            handContainer.appendChild(existingCard);
         }
+        
+        dropZone.appendChild(draggedCard);
+        dropZoneContent.style.display = 'none';
 
-        function setupDragAndDrop() {
-            const cards = document.querySelectorAll('.card');
-            const dropZone = document.getElementById('card-drop-zone');
-            const handContainer = document.getElementById('card-hand-container');
-            const dropZoneContent = dropZone.querySelector('.drop-zone-content');
-
-            // Card drag events
-            cards.forEach(card => {
-                card.addEventListener('dragstart', dragstart);
-                card.addEventListener('dragend', dragend);
-            });
-
-            // Drop zone events
-            dropZone.addEventListener('dragover', dragover);
-            dropZone.addEventListener('dragenter', dragenter);
-            dropZone.addEventListener('dragleave', dragleave);
-            dropZone.addEventListener('drop', drop);
-            handContainer.addEventListener('dragover', dragover);
-            handContainer.addEventListener('dragenter', dragenter);
-            handContainer.addEventListener('dragleave', dragleave);
-            handContainer.addEventListener('drop', drop);
+        addRandomCardToHand();
+    
+    } else if (e.target.closest('#card-hand-container')) {
+        
+        if (draggedCard.closest('#card-drop-zone')) {
+            dropZoneContent.style.display = 'block';
         }
-
-        function dragstart(e) {
-            // Store the ID of the dragged card
-            e.dataTransfer.setData('text/plain', e.target.id);
-            // Add a class to reduce opacity during drag
-            setTimeout(() => e.target.classList.add('dragging'), 0);
-        }
-
-        function dragend(e) {
-            // Remove the dragging class
-            e.target.classList.remove('dragging');
-        }
-
-        function dragover(e) {
-            // Prevent default to allow drop
-            e.preventDefault();
-        }
-
-        function dragenter(e) {
-            // Highlight the drop zone or container when an item is dragged over it
-            if (e.target.classList.contains('drop-zone')) {
-                e.target.classList.add('drag-over');
-            } else if (e.target.id === 'card-hand-container') {
-                e.target.classList.add('drag-over');
-            }
-        }
-
-        function dragleave(e) {
-            // Remove highlight when the drag leaves the element
-            if (e.target.classList.contains('drop-zone')) {
-                e.target.classList.remove('drag-over');
-            } else if (e.target.id === 'card-hand-container') {
-                e.target.classList.remove('drag-over');
-            }
-        }
-
-        function drop(e) {
-            e.preventDefault();
-            const cardId = e.dataTransfer.getData('text/plain');
-            const draggedCard = document.getElementById(cardId);
-            const dropZone = document.getElementById('card-drop-zone');
-            const handContainer = document.getElementById('card-hand-container');
-            const dropZoneContent = dropZone.querySelector('.drop-zone-content');
-
-            // Remove drag-over class from any element
-            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-
-            if (e.target === dropZone || $.contains(dropZone, e.target) || e.target.id === 'card-drop-zone') {
-                // Drop onto the drop zone
-                
-                // Check if drop zone already contains a card
-                const existingCard = dropZone.querySelector('.card');
-                if (existingCard) {
-                    // If there's an existing card, move it back to the hand
-                    handContainer.appendChild(existingCard);
-                }
-                
-                // Move the new card to the drop zone
-                dropZone.appendChild(draggedCard);
-                dropZoneContent.style.display = 'none'; // Hide the "Drop Card Here" text
-            
-            } else if (e.target === handContainer || $.contains(handContainer, e.target) || e.target.id === 'card-hand-container') {
-                // Drop onto the card hand container
-                
-                // If the card was in the drop zone, show the drop zone content
-                if (draggedCard.closest('#card-drop-zone')) {
-                    dropZoneContent.style.display = 'block';
-                }
-                
-                // Append the card to the hand (it will naturally order itself via flexbox)
-                e.target.appendChild(draggedCard);
-            }
+        
+        const actualHandContainer = e.target.closest('#card-hand-container');
+        actualHandContainer.appendChild(draggedCard);
+    }
         }
     </script>
