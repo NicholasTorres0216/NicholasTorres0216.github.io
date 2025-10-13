@@ -1,0 +1,29 @@
+{
+  "cardHandImages": [
+    {
+      "id": "card1",
+      "fileName": "ace_of_spades.png",
+      "altText": "Ace of Spades"
+    },
+    {
+      "id": "card2",
+      "fileName": "king_of_hearts.png",
+      "altText": "King of Hearts"
+    },
+    {
+      "id": "card3",
+      "fileName": "queen_of_clubs.png",
+      "altText": "Queen of Clubs"
+    },
+    {
+      "id": "card4",
+      "fileName": "jack_of_diamonds.png",
+      "altText": "Jack of Diamonds"
+    },
+    {
+      "id": "card5",
+      "fileName": "10_of_spades.png",
+      "altText": "10 of Spades"
+    }
+  ]
+}
