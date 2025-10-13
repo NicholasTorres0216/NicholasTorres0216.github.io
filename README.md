@@ -368,6 +368,88 @@
                 width: 100%;
             }
         }
+        /* --- Assignment 7 CSS: Drag and Drop Card Game --- */
+        #assignment-7-page {
+            text-align: center;
+        }
+
+        .card-hand {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 2rem;
+            min-height: 180px;
+        }
+
+        .card-hand h3 {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            width: 120px;
+            height: 170px;
+            cursor: grab;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        /* Drag and drop effects */
+        .card.dragging {
+            opacity: 0.4;
+            cursor: grabbing;
+        }
+
+        .drop-zone {
+            width: 100%;
+            max-width: 400px;
+            height: 200px;
+            border: 3px dashed #4a5568;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            background-color: #f9f9f9;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .drop-zone-content {
+            font-size: 1.1rem;
+            color: #777;
+        }
+
+        .drop-zone.drag-over {
+            background-color: #e0e7ff;
+            border-color: #2f363d;
+        }
+
+        .drop-zone .card {
+            margin-top: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .drop-zone h3 {
+            margin: 0;
+            padding: 10px;
+            color: #2f363d;
+        }
     </style>
 </head>
 <body>
@@ -399,6 +481,7 @@
                     <li><a href="#" onclick="showPage('assignment-4-page')">Assignment 4</a></li>
                     <li><a href="#" onclick="showPage('spirograph-page')">Assignment 5</a></li>
                     <li><a href="#" onclick="showPage('assignment-6-page')">Assignment 6</a></li>
+                    <li><a href="#" onclick="showPage('assignment-7-page')">Assignment 7</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -520,6 +603,23 @@
             </div>
         </section>
 
+        <section id="assignment-7-page" class="page-content">
+            <div class="form-section" style="max-width: 800px;">
+                <h2>Assignment 7: Drag & Drop Card Game</h2>
+                <p>Drag a card from the hand below into the designated drop zone.</p>
+                
+                <h3>Your Card Hand</h3>
+                <div id="card-hand-container" class="card-hand">
+                    <p id="card-load-status">Loading cards...</p>
+                </div>
+
+                <h3>Drop Zone</h3>
+                <div id="card-drop-zone" class="drop-zone">
+                    <p class="drop-zone-content">Drop Card Here</p>
+                </div>
+            </div>
+        </section>
+
         <section id="form-page" class="page-content">
             <div id="form-container" class="form-section">
                 <h2>Contact Form</h2>
@@ -615,6 +715,7 @@
         let currentSpiroT = 0;
         let spiroParams = { R: 0, r: 0, O: 0, steps: 0, maxT: 0 };
         const drawingSpeed = 0.1;
+        const CARD_IMAGE_PATH = 'PNG-cards-1.3/';
 
         window.onload = function() {
             generateCaptcha();
@@ -656,6 +757,10 @@
             
             if (pageId === 'assignment-6-page') {
                 loadPlayerData();
+            }
+
+            if (pageId === 'assignment-7-page') {
+                loadAndRenderCardHand();
             }
         }
 
@@ -1219,5 +1324,135 @@ ${formData.message}`;
                 $('#team-title').text('Error Loading Data');
                 $('#team-info').html('<p style="color: red;">Could not load players.json: ' + err + '. Please ensure the file exists and is valid JSON and that the JSON file is in the same directory as this HTML file.</p>');
             });
+        }
+
+        /* --- Assignment 7 Functions: Drag and Drop Card Game --- */
+
+        function loadAndRenderCardHand() {
+            // Use jQuery's getJSON to load the local JSON file
+            $.getJSON('card_images.json', function(data) {
+                if (data && data.cardHandImages) {
+                    renderCardHand(data.cardHandImages);
+                } else {
+                    $('#card-load-status').text('Error: JSON data is missing "cardHandImages" array.');
+                }
+            }).fail(function(jqxhr, textStatus, error) {
+                const err = textStatus + ", " + error;
+                $('#card-load-status').html('Error loading card_images.json: ' + err + '. Please ensure the file exists and is in the same directory.');
+            });
+        }
+
+        function renderCardHand(cardData) {
+            const handContainer = $('#card-hand-container');
+            handContainer.empty(); // Clear "Loading cards..." message and previous cards
+
+            cardData.forEach(function(card) {
+                const cardElement = $('<div>')
+                    .addClass('card')
+                    .attr('draggable', true)
+                    .attr('id', card.id)
+                    .html(`<img src="${CARD_IMAGE_PATH}${card.fileName}" alt="${card.altText}">`);
+                
+                handContainer.append(cardElement);
+            });
+
+            // After rendering, set up the drag-and-drop functionality
+            setupDragAndDrop();
+        }
+
+        function setupDragAndDrop() {
+            const cards = document.querySelectorAll('.card');
+            const dropZone = document.getElementById('card-drop-zone');
+            const handContainer = document.getElementById('card-hand-container');
+            const dropZoneContent = dropZone.querySelector('.drop-zone-content');
+
+            // Card drag events
+            cards.forEach(card => {
+                card.addEventListener('dragstart', dragstart);
+                card.addEventListener('dragend', dragend);
+            });
+
+            // Drop zone events
+            dropZone.addEventListener('dragover', dragover);
+            dropZone.addEventListener('dragenter', dragenter);
+            dropZone.addEventListener('dragleave', dragleave);
+            dropZone.addEventListener('drop', drop);
+            handContainer.addEventListener('dragover', dragover);
+            handContainer.addEventListener('dragenter', dragenter);
+            handContainer.addEventListener('dragleave', dragleave);
+            handContainer.addEventListener('drop', drop);
+        }
+
+        function dragstart(e) {
+            // Store the ID of the dragged card
+            e.dataTransfer.setData('text/plain', e.target.id);
+            // Add a class to reduce opacity during drag
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
+
+        function dragend(e) {
+            // Remove the dragging class
+            e.target.classList.remove('dragging');
+        }
+
+        function dragover(e) {
+            // Prevent default to allow drop
+            e.preventDefault();
+        }
+
+        function dragenter(e) {
+            // Highlight the drop zone or container when an item is dragged over it
+            if (e.target.classList.contains('drop-zone')) {
+                e.target.classList.add('drag-over');
+            } else if (e.target.id === 'card-hand-container') {
+                e.target.classList.add('drag-over');
+            }
+        }
+
+        function dragleave(e) {
+            // Remove highlight when the drag leaves the element
+            if (e.target.classList.contains('drop-zone')) {
+                e.target.classList.remove('drag-over');
+            } else if (e.target.id === 'card-hand-container') {
+                e.target.classList.remove('drag-over');
+            }
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            const cardId = e.dataTransfer.getData('text/plain');
+            const draggedCard = document.getElementById(cardId);
+            const dropZone = document.getElementById('card-drop-zone');
+            const handContainer = document.getElementById('card-hand-container');
+            const dropZoneContent = dropZone.querySelector('.drop-zone-content');
+
+            // Remove drag-over class from any element
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+
+            if (e.target === dropZone || $.contains(dropZone, e.target) || e.target.id === 'card-drop-zone') {
+                // Drop onto the drop zone
+                
+                // Check if drop zone already contains a card
+                const existingCard = dropZone.querySelector('.card');
+                if (existingCard) {
+                    // If there's an existing card, move it back to the hand
+                    handContainer.appendChild(existingCard);
+                }
+                
+                // Move the new card to the drop zone
+                dropZone.appendChild(draggedCard);
+                dropZoneContent.style.display = 'none'; // Hide the "Drop Card Here" text
+            
+            } else if (e.target === handContainer || $.contains(handContainer, e.target) || e.target.id === 'card-hand-container') {
+                // Drop onto the card hand container
+                
+                // If the card was in the drop zone, show the drop zone content
+                if (draggedCard.closest('#card-drop-zone')) {
+                    dropZoneContent.style.display = 'block';
+                }
+                
+                // Append the card to the hand (it will naturally order itself via flexbox)
+                e.target.appendChild(draggedCard);
+            }
         }
     </script>
