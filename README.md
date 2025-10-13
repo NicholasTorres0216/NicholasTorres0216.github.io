@@ -1328,40 +1328,6 @@ ${formData.message}`;
 
         /* --- Assignment 7 Functions: Drag and Drop Card Game --- */
 
-function addRandomCardToHand() {
-    const handContainer = document.getElementById('card-hand-container');
-    
-    const availableCards = [
-        "2_of_clubs.png", "3_of_diamonds.png", "4_of_hearts.png", "5_of_spades.png", 
-        "6_of_clubs.png", "7_of_diamonds.png", "8_of_hearts.png", "9_of_spades.png", 
-        "jack_of_clubs.png", "queen_of_diamonds.png", "king_of_spades.png", "ace_of_hearts",
-    ];
-
-    const randomIndex = Math.floor(Math.random() * availableCards.length);
-    const newFileName = availableCards[randomIndex];
-    const newID = 'card' + Date.now();
-    const newAltText = newFileName.replace(/_/g, ' ').replace('.png', '');
-
-    const cardElement = document.createElement('div');
-    cardElement.classList.add('card');
-    cardElement.setAttribute('draggable', true);
-    cardElement.id = newID;
-
-    const imgElement = document.createElement('img');
-    imgElement.src = CARD_IMAGE_PATH + newFileName;
-    imgElement.alt = newAltText;
-    // FIX: Prevents the image from being seen as the drag source, ensuring the parent <div> is used
-    imgElement.setAttribute('draggable', false); 
-
-    cardElement.appendChild(imgElement);
-    
-    handContainer.appendChild(cardElement);
-    
-    cardElement.addEventListener('dragstart', dragstart);
-    cardElement.addEventListener('dragend', dragend);
-}
-
-
 function loadAndRenderCardHand() {
     $.getJSON('card_images.json', function(data) {
         if (data && data.cardHandImages) {
@@ -1432,7 +1398,6 @@ function dragover(e) {
 }
 
 function dragenter(e) {
-    // FIX: Use .closest() here too to ensure we reliably check if we are over the zone.
     if (e.target.closest('#card-drop-zone')) {
         document.getElementById('card-drop-zone').classList.add('drag-over');
     } else if (e.target.closest('#card-hand-container')) {
@@ -1441,7 +1406,6 @@ function dragenter(e) {
 }
 
 function dragleave(e) {
-    // FIX: Check if the element we are leaving is the drop zone or hand container
     if (e.target.id === 'card-drop-zone') {
         e.target.classList.remove('drag-over');
     } else if (e.target.id === 'card-hand-container') {
@@ -1457,7 +1421,6 @@ function drop(e) {
     const handContainer = document.getElementById('card-hand-container');
     const dropZoneContent = dropZone.querySelector('.drop-zone-content');
 
-    // FIX: Ensure the visual highlight is immediately removed after drop
     document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
 
     const targetIsDropZone = e.target.closest('#card-drop-zone');
@@ -1472,7 +1435,7 @@ function drop(e) {
         dropZone.appendChild(draggedCard);
         dropZoneContent.style.display = 'none';
 
-        addRandomCardToHand();
+        // Card generation removed here
     
     } else if (e.target.closest('#card-hand-container')) {
         
