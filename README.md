@@ -368,7 +368,6 @@
                 width: 100%;
             }
         }
-        /* --- Assignment 7 CSS: Drag and Drop Card Game --- */
         #assignment-7-page {
             text-align: center;
         }
@@ -409,7 +408,6 @@
             transform: translateY(-5px);
         }
         
-        /* Drag and drop effects */
         .card.dragging {
             opacity: 0.4;
             cursor: grabbing;
@@ -482,6 +480,7 @@
                     <li><a href="#" onclick="showPage('spirograph-page')">Assignment 5</a></li>
                     <li><a href="#" onclick="showPage('assignment-6-page')">Assignment 6</a></li>
                     <li><a href="#" onclick="showPage('assignment-7-page')">Assignment 7</a></li>
+                    <li><a href="#" onclick="showPage('assignment-9-page')">Assignment 9</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -620,6 +619,30 @@
             </div>
         </section>
 
+        <section id="assignment-9-page" class="page-content">
+            <div class="form-section" style="max-width: 800px;">
+                <h2>Assignment 9: Local Storage Inventory Tracker</h2>
+                <p>Add items to your inventory. The data is saved locally in your browser.</p>
+                
+                <div class="form-group">
+                    <label for="itemName">Item Name</label>
+                    <input type="text" id="itemName" placeholder="e.g., Laptop">
+                </div>
+                <div class="form-group">
+                    <label for="itemQuantity">Quantity</label>
+                    <input type="number" id="itemQuantity" min="1" value="1">
+                </div>
+                <button class="calculate-btn" onclick="addItemToInventory()">Add Item</button>
+
+                <div class="results-container" style="margin-top: 2rem;">
+                    <h3>Current Inventory</h3>
+                    <div id="inventory-list">
+                        <p style="text-align: center; color: #777;">No items in inventory. Add one above.</p>
+                    </div>
+                    <button class="submit-btn" onclick="clearInventory()" style="margin-top: 1.5rem; background-color: #d9534f;">Clear All</button>
+                </div>
+            </div>
+        </section>
         <section id="form-page" class="page-content">
             <div id="form-container" class="form-section">
                 <h2>Contact Form</h2>
@@ -724,7 +747,7 @@
             canvas.width = 600;
             canvas.height = 400;
             const spiroCanvas = document.getElementById('spirograph-canvas');
-            spiroCanvas.width = 600; 
+            spiroCanvas.width = 600;
             spiroCanvas.height = 600;
         };
 
@@ -741,9 +764,8 @@
             pages.forEach(page => {
                 page.classList.remove('active');
             });
-
             document.getElementById(pageId).classList.add('active');
-            
+
             if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
                 animationFrameId = null;
@@ -754,13 +776,17 @@
                 generateCaptcha();
                 showForm();
             }
-            
+
             if (pageId === 'assignment-6-page') {
                 loadPlayerData();
             }
 
             if (pageId === 'assignment-7-page') {
                 loadAndRenderCardHand();
+            }
+
+            if (pageId === 'assignment-9-page') {
+                renderInventory();
             }
         }
 
@@ -773,10 +799,9 @@
             document.getElementById('form-container').style.display = 'none';
             document.getElementById('confirmation-container').style.display = 'block';
         }
-        
+
         document.getElementById('contactForm').addEventListener('submit', function(event) {
             event.preventDefault();
-            
             if (validateForm()) {
                 formData = {
                     firstName: document.getElementById('firstName').value.trim(),
@@ -790,7 +815,7 @@
                     birthdate: document.getElementById('birthdate').value.trim(),
                     message: document.getElementById('message').value.trim()
                 };
-                
+
                 const confirmationDetails = document.getElementById('confirmation-details');
                 confirmationDetails.innerHTML = `
                     <p><strong>Full Name:</strong> ${formData.firstName} ${formData.lastName}</p>
@@ -800,11 +825,10 @@
                     <p><strong>Birth Date:</strong> ${formData.birthdate}</p>
                     <p><strong>Message:</strong> ${formData.message}</p>
                 `;
-                
                 showConfirmationPage();
             }
         });
-        
+
         function validateField(inputElement) {
             const fieldId = inputElement.id;
             const value = inputElement.value.trim();
@@ -870,378 +894,245 @@
         function validateForm() {
             let isValid = true;
             const formElements = document.querySelectorAll('#contactForm input, #contactForm select, #contactForm textarea');
-            formElements.forEach(el => {
-                if (el.id) {
-                    if (!validateField(el)) {
-                        isValid = false;
-                    }
+            formElements.forEach(input => {
+                if (input.name && !validateField(input)) {
+                    isValid = false;
                 }
             });
             return isValid;
         }
 
-        function showValidationError(elementId, message, inputElement) {
-            const errorElement = document.getElementById(elementId);
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-            inputElement.closest('.form-group').classList.add('invalid');
-        }
-
-        function hideValidationError(elementId, inputElement) {
-            const errorElement = document.getElementById(elementId);
-            errorElement.textContent = '';
-            errorElement.style.display = 'none';
-            inputElement.closest('.form-group').classList.remove('invalid');
-        }
-
         function setupValidationListeners() {
-            const formElements = document.querySelectorAll('#contactForm input:not(#captcha), #contactForm select, #contactForm textarea');
-            formElements.forEach(el => {
-                el.addEventListener('blur', () => {
-                    validateField(el);
+            const formElements = document.querySelectorAll('#contactForm input, #contactForm select, #contactForm textarea');
+            formElements.forEach(input => {
+                input.addEventListener('blur', function() {
+                    validateField(this);
                 });
-                el.addEventListener('input', () => {
-                    hideValidationError(el.id + 'Error', el);
+                input.addEventListener('input', function() {
+                    hideValidationError(this.id + 'Error', this);
                 });
             });
-            
-            const phoneInput = document.getElementById('phone');
-            phoneInput.addEventListener('input', function(e) {
-                const cleanedValue = e.target.value.replace(/\D/g, '');
-                let formattedValue = '';
-                if (cleanedValue.length > 0) {
-                    formattedValue += '(' + cleanedValue.substring(0, 3);
-                }
-                if (cleanedValue.length >= 4) {
-                    formattedValue += ') ' + cleanedValue.substring(3, 6);
-                }
-                if (cleanedValue.length >= 7) {
-                    formattedValue += '-' + cleanedValue.substring(6, 10);
-                }
-                e.target.value = formattedValue;
-            });
-            
-            const captchaInput = document.getElementById('captcha');
-            captchaInput.addEventListener('input', () => validateField(captchaInput));
+        }
 
-            const spiroInputs = ['spiroR', 'spiro_r', 'spiroO'];
-            spiroInputs.forEach(id => {
-                const input = document.getElementById(id);
-                if (input) {
-                    input.addEventListener('blur', () => {
-                        let R_val = parseFloat(document.getElementById('spiroR').value);
-                        let r_val = parseFloat(document.getElementById('spiro_r').value);
+        function showValidationError(errorId, message, inputElement) {
+            document.getElementById(errorId).textContent = message;
+            document.getElementById(errorId).style.display = 'block';
+            if (inputElement) {
+                inputElement.closest('.form-group').classList.add('invalid');
+            }
+        }
 
-                        if (id === 'spiroR') {
-                           validateSpiroParam('spiroR', 10, 250, 'spiroRError');
-                        } else if (id === 'spiro_r') {
-                           if (!validateSpiroParam('spiro_r', 1, 240, 'spiro_rError')) return;
-                           if (r_val >= R_val && !isNaN(R_val)) {
-                               document.getElementById('spiro_rError').textContent = 'Inner radius (r) must be less than Outer radius (R).';
-                               document.getElementById('spiro_rError').style.display = 'block';
-                               input.closest('.form-group').classList.add('invalid');
-                           } else {
-                               document.getElementById('spiro_rError').style.display = 'none';
-                               input.closest('.form-group').classList.remove('invalid');
-                           }
-                        } else if (id === 'spiroO') {
-                           validateSpiroParam('spiroO', 0, 150, 'spiroOError');
-                        }
-                    });
-                     input.addEventListener('input', () => {
-                         document.getElementById(id + 'Error').style.display = 'none';
-                         input.closest('.form-group').classList.remove('invalid');
-                     });
-                }
-            });
+        function hideValidationError(errorId, inputElement) {
+            document.getElementById(errorId).style.display = 'none';
+            if (inputElement) {
+                inputElement.closest('.form-group').classList.remove('invalid');
+            }
         }
 
         function sendEmail() {
-            const to = 'youremail@example.com';
-            const subject = 'Contact Form Submission';
             
-            const body = `Full Name: ${formData.firstName} ${formData.lastName}
-Address: ${formData.address}, ${formData.city}, ${formData.state} ${formData.zip}
-Phone: ${formData.phone}
-Email: ${formData.email}
-Birth Date: ${formData.birthdate}
-Message:
-${formData.message}`;
+            alert('Form submitted successfully!');
             
-            const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.location.href = mailtoLink;
+            showPage('home-page');
+            document.getElementById('contactForm').reset();
+            generateCaptcha();
         }
 
+        
         function calculateProjectileMotion() {
-            const initialVelocity = parseFloat(document.getElementById('initialVelocity').value);
-            const launchAngle = parseFloat(document.getElementById('launchAngle').value);
-            const gravity = 9.8;
+            const v = parseFloat(document.getElementById('initialVelocity').value);
+            const angleDeg = parseFloat(document.getElementById('launchAngle').value);
+            const g = 9.81;
+            const angleRad = angleDeg * (Math.PI / 180);
 
-            if (isNaN(initialVelocity) || isNaN(launchAngle) || initialVelocity < 0 || launchAngle < 0 || launchAngle > 90) {
-                document.getElementById('projectile-results-container').style.display = 'none';
+            if (isNaN(v) || isNaN(angleDeg) || v < 0 || angleDeg < 0 || angleDeg > 90) {
+                alert("Please enter valid positive numbers for velocity and an angle between 0 and 90 degrees.");
                 return;
             }
 
-            const angleInRadians = launchAngle * (Math.PI / 180);
-
-            const timeOfFlight = (2 * initialVelocity * Math.sin(angleInRadians)) / gravity;
-
-            const maxHeight = (Math.pow(initialVelocity, 2) * Math.pow(Math.sin(angleInRadians), 2)) / (2 * gravity);
-
-            const horizontalRange = (Math.pow(initialVelocity, 2) * Math.sin(2 * angleInRadians)) / gravity;
+            const range = (v * v * Math.sin(2 * angleRad)) / g;
+            const maxHeight = (v * v * Math.sin(angleRad) * Math.sin(angleRad)) / (2 * g);
+            const timeOfFlight = (2 * v * Math.sin(angleRad)) / g;
 
             document.getElementById('timeOfFlight').textContent = timeOfFlight.toFixed(2);
             document.getElementById('maxHeight').textContent = maxHeight.toFixed(2);
-            document.getElementById('horizontalRange').textContent = horizontalRange.toFixed(2);
+            document.getElementById('horizontalRange').textContent = range.toFixed(2);
             document.getElementById('projectile-results-container').style.display = 'block';
         }
 
+        
         function calculateQuadratic() {
             const a = parseFloat(document.getElementById('a-coefficient').value);
             const b = parseFloat(document.getElementById('b-coefficient').value);
             const c = parseFloat(document.getElementById('c-coefficient').value);
-            
-            const resultsContainer = document.getElementById('quadratic-results');
-            const graphContainer = document.getElementById('graph-container');
-            const rootsElement = document.getElementById('roots');
-            const vertexXElement = document.getElementById('vertex-x');
-            const vertexYElement = document.getElementById('vertex-y');
 
             if (isNaN(a) || isNaN(b) || isNaN(c)) {
-                resultsContainer.style.display = 'none';
-                graphContainer.style.display = 'none';
+                alert("Please enter valid numbers for all coefficients.");
                 return;
             }
 
             const discriminant = b * b - 4 * a * c;
-            let roots = '';
+            let rootsText = '';
 
             if (discriminant >= 0) {
                 const root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
                 const root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-                roots = `${root1.toFixed(2)}, ${root2.toFixed(2)}`;
+                if (root1 === root2) {
+                    rootsText = root1.toFixed(2);
+                } else {
+                    rootsText = `${root1.toFixed(2)}, ${root2.toFixed(2)}`;
+                }
             } else {
                 const realPart = (-b / (2 * a)).toFixed(2);
                 const imaginaryPart = (Math.sqrt(-discriminant) / (2 * a)).toFixed(2);
-                roots = `${realPart} + ${imaginaryPart}i, ${realPart} - ${imaginaryPart}i`;
+                rootsText = `${realPart} + ${imaginaryPart}i, ${realPart} - ${imaginaryPart}i`;
             }
 
             const vertexX = -b / (2 * a);
             const vertexY = a * vertexX * vertexX + b * vertexX + c;
 
-            rootsElement.textContent = roots;
-            vertexXElement.textContent = vertexX.toFixed(2);
-            vertexYElement.textContent = vertexY.toFixed(2);
+            document.getElementById('roots').textContent = rootsText;
+            document.getElementById('vertex-x').textContent = vertexX.toFixed(2);
+            document.getElementById('vertex-y').textContent = vertexY.toFixed(2);
+            document.getElementById('quadratic-results').style.display = 'block';
 
-            resultsContainer.style.display = 'block';
-            graphContainer.style.display = 'block';
-            
-            drawQuadraticGraph(a, b, c);
+            drawQuadraticGraph(a, b, c, vertexX, vertexY);
         }
 
-        function drawQuadraticGraph(a, b, c) {
+        function drawQuadraticGraph(a, b, c, vx, vy) {
             const canvas = document.getElementById('graph-canvas');
             const ctx = canvas.getContext('2d');
             const width = canvas.width;
             const height = canvas.height;
+            const padding = 20;
 
             ctx.clearRect(0, 0, width, height);
 
-            const vertexX = -b / (2 * a);
-            const vertexY = a * vertexX * vertexX + b * vertexX + c;
-
-            const xRange = 20;
-            const xMin = vertexX - (xRange / 2);
-            const xMax = vertexX + (xRange / 2);
             
-            const yAtMin = a * xMin * xMin + b * xMin + c;
-            const yAtMax = a * xMax * xMax + b * xMax + c;
-            const yIntercept = c;
+            const rangeX = 10;
+            const minX = -rangeX;
+            const maxX = rangeX;
+            let minY = vy - 10;
+            let maxY = vy + 10;
+            if (a < 0) {
+                minY = vy - 20;
+            } else if (a > 0) {
+                maxY = vy + 20;
+            }
+            if (minY === maxY) {
+                 minY = vy - 5;
+                 maxY = vy + 5;
+            }
+            
 
-            const yValues = [yAtMin, yAtMax, vertexY, yIntercept];
-            const yMin = Math.min(...yValues) - 5;
-            const yMax = Math.max(...yValues) + 5;
-            const yRange = yMax - yMin;
+            const scaleX = (width - 2 * padding) / (maxX - minX);
+            const scaleY = (height - 2 * padding) / (maxY - minY);
 
-            const xScale = width / xRange;
-            const yScale = height / yRange;
+            const toScreenX = (x) => padding + (x - minX) * scaleX;
+            const toScreenY = (y) => height - padding - (y - minY) * scaleY;
 
-            const originX = -xMin * xScale;
-            const originY = height + yMin * yScale;
-
-            ctx.strokeStyle = '#f0f0f0';
+            
+            ctx.strokeStyle = '#ccc';
             ctx.lineWidth = 1;
-
-            for (let i = Math.ceil(xMin); i <= Math.floor(xMax); i += 1) {
-                if (i !== 0) {
-                    ctx.beginPath();
-                    ctx.moveTo(originX + i * xScale, 0);
-                    ctx.lineTo(originX + i * xScale, height);
-                    ctx.stroke();
-                }
-            }
-            const yStep = yRange > 20 ? 5 : 1;
-            for (let i = Math.ceil(yMin); i <= Math.floor(yMax); i += yStep) {
-                if (i !== 0) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, originY - i * yScale);
-                    ctx.lineTo(width, originY - i * yScale);
-                    ctx.stroke();
-                }
-            }
-
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 2;
-            ctx.font = '10px Roboto';
-            ctx.fillStyle = '#333';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-
-            if (originY > 0 && originY < height) {
-                ctx.beginPath();
-                ctx.moveTo(0, originY);
-                ctx.lineTo(width, originY);
-                ctx.stroke();
-                for (let i = Math.ceil(xMin); i <= Math.floor(xMax); i += 1) {
-                    if (i !== 0) {
-                        ctx.fillText(i, originX + i * xScale, originY + 5);
-                    }
-                }
-            } else {
-                const labelY = originY > height ? height - 15 : 5;
-                for (let i = Math.ceil(xMin); i <= Math.floor(xMax); i += 2) {
-                    ctx.fillText(i, originX + i * xScale, labelY);
-                }
-            }
-
-            if (originX > 0 && originX < width) {
-                ctx.beginPath();
-                ctx.moveTo(originX, 0);
-                ctx.lineTo(originX, height);
-                ctx.stroke();
-                ctx.textAlign = 'right';
-                ctx.textBaseline = 'middle';
-                for (let i = Math.ceil(yMin); i <= Math.floor(yMax); i += yStep) {
-                    if (i !== 0) {
-                        ctx.fillText(i, originX - 5, originY - i * yScale);
-                    }
-                }
-            } else {
-                const labelX = originX > width ? width - 5 : 5;
-                ctx.textAlign = originX > width ? 'right' : 'left';
-                ctx.textBaseline = 'middle';
-                for (let i = Math.ceil(yMin); i <= Math.floor(yMax); i += yStep) {
-                    ctx.fillText(i, labelX, originY - i * yScale);
-                }
-            }
-
-            ctx.textAlign = originX < 15 ? 'left' : 'center';
-            ctx.textBaseline = originY < 15 ? 'top' : 'bottom';
-            ctx.fillText('0', originX + (originX < 15 ? 2 : 0), originY + (originY < 15 ? 2 : -2));
-
-
-            ctx.strokeStyle = '#d9534f';
-            ctx.lineWidth = 3;
             ctx.beginPath();
+            
+            
+            const screenYZero = toScreenY(0);
+            if (screenYZero >= padding && screenYZero <= height - padding) {
+                ctx.moveTo(padding, screenYZero);
+                ctx.lineTo(width - padding, screenYZero);
+            }
+            
+            
+            const screenXZero = toScreenX(0);
+            if (screenXZero >= padding && screenXZero <= width - padding) {
+                ctx.moveTo(screenXZero, padding);
+                ctx.lineTo(screenXZero, height - padding);
+            }
+            ctx.stroke();
 
-            let firstPoint = true;
-            for (let px = 0; px <= width; px++) {
-                const x = xMin + (px / xScale); 
+            
+            ctx.strokeStyle = '#2f363d';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            for (let i = 0; i <= width - 2 * padding; i++) {
+                const x = minX + (i / (width - 2 * padding)) * (maxX - minX);
                 const y = a * x * x + b * x + c;
-                const py = originY - y * yScale;
 
-                if (py >= -1000 && py <= height + 1000) {
-                    if (firstPoint) {
-                        ctx.moveTo(px, py);
-                        firstPoint = false;
-                    } else {
-                        ctx.lineTo(px, py);
-                    }
+                if (i === 0) {
+                    ctx.moveTo(toScreenX(x), toScreenY(y));
+                } else {
+                    ctx.lineTo(toScreenX(x), toScreenY(y));
                 }
             }
-
             ctx.stroke();
+
+            
+            ctx.fillStyle = '#d9534f';
+            ctx.beginPath();
+            ctx.arc(toScreenX(vx), toScreenY(vy), 4, 0, 2 * Math.PI);
+            ctx.fill();
+
+            document.getElementById('graph-container').style.display = 'block';
         }
 
+        
         function gcd(a, b) {
-            return b === 0 ? a : gcd(b, a % b);
+            return b ? gcd(b, a % b) : a;
         }
 
-        function validateSpiroParam(id, min, max, errorMessageId) {
-            const input = document.getElementById(id);
-            const value = parseFloat(input.value);
-            const errorElement = document.getElementById(errorMessageId);
-            if (isNaN(value) || value < min || value > max) {
-                errorElement.style.display = 'block';
-                input.closest('.form-group').classList.add('invalid');
-                return false;
-            } else {
-                errorElement.style.display = 'none';
-                input.closest('.form-group').classList.remove('invalid');
-                return true;
-            }
-        }
-
-        function drawSpirograph(isRandom) {
+        function drawSpirograph(randomize) {
             if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-                currentSpiroT = 0;
             }
 
             const canvas = document.getElementById('spirograph-canvas');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = '#2f363d';
+
             let R, r, O;
 
-            if (isRandom) {
-                R = Math.floor(Math.random() * (250 - 100 + 1)) + 100;
-                r = Math.floor(Math.random() * (R - 20 - 1 + 1)) + 10; 
-                O = Math.floor(Math.random() * (r - 1 + 1));
+            if (randomize) {
+                R = Math.floor(Math.random() * 150) + 100;
+                r = Math.floor(Math.random() * (R - 20)) + 20;
+                O = Math.floor(Math.random() * 100) + 50;
+                
+                
                 document.getElementById('spiroR').value = R;
                 document.getElementById('spiro_r').value = r;
                 document.getElementById('spiroO').value = O;
-                document.getElementById('spiroRError').style.display = 'none';
-                document.getElementById('spiro_rError').style.display = 'none';
-                document.getElementById('spiroOError').style.display = 'none';
-                document.getElementById('spiroR').closest('.form-group').classList.remove('invalid');
-                document.getElementById('spiro_r').closest('.form-group').classList.remove('invalid');
-                document.getElementById('spiroO').closest('.form-group').classList.remove('invalid');
 
             } else {
-                let isValid = true;
-                isValid = validateSpiroParam('spiroR', 10, 250, 'spiroRError') && isValid;
-                isValid = validateSpiroParam('spiro_r', 1, 240, 'spiro_rError') && isValid;
-                isValid = validateSpiroParam('spiroO', 0, 150, 'spiroOError') && isValid;
+                R = parseInt(document.getElementById('spiroR').value);
+                r = parseInt(document.getElementById('spiro_r').value);
+                O = parseInt(document.getElementById('spiroO').value);
 
-                if (!isValid) {
+                
+                if (isNaN(R) || R < 10 || R > 250) {
+                    alert('R must be between 10 and 250.');
                     return;
                 }
-
-                R = parseFloat(document.getElementById('spiroR').value);
-                r = parseFloat(document.getElementById('spiro_r').value);
-                O = parseFloat(document.getElementById('spiroO').value);
-
-                if (r >= R) {
-                    document.getElementById('spiro_rError').textContent = 'Inner radius (r) must be less than Outer radius (R).';
-                    document.getElementById('spiro_rError').style.display = 'block';
-                    document.getElementById('spiro_r').closest('.form-group').classList.add('invalid');
+                if (isNaN(r) || r < 1 || r > 240) {
+                    alert('r must be between 1 and 240.');
                     return;
-                } else {
-                     document.getElementById('spiro_rError').style.display = 'none';
-                     document.getElementById('spiro_r').closest('.form-group').classList.remove('invalid');
+                }
+                if (isNaN(O) || O < 0 || O > 150) {
+                    alert('O must be between 0 and 150.');
+                    return;
                 }
             }
-            
-            const k = gcd(R, r);
-            const maxT = (2 * Math.PI * r) / k;
+
+            const g = gcd(R, r);
+            const L = r / g; 
+            const maxT = 2 * Math.PI * L;
 
             spiroParams = { R, r, O, maxT };
             currentSpiroT = 0;
+
             ctx.beginPath();
-            ctx.strokeStyle = '#2f363d';
-            ctx.lineWidth = 1.5;
 
             const initialX = (R + r) * Math.cos(0) - (r + O) * Math.cos(((R + r) / r) * 0);
             const initialY = (R + r) * Math.sin(0) - (r + O) * Math.sin(((R + r) / r) * 0);
@@ -1276,6 +1167,7 @@ ${formData.message}`;
                 t += drawingSpeed;
             }
             ctx.stroke();
+
             currentSpiroT = t;
 
             if (!pathCompleted) {
@@ -1284,12 +1176,26 @@ ${formData.message}`;
                 animationFrameId = null;
             }
         }
+
         
         function loadPlayerData() {
             
-            $.getJSON('players.json', function(data) {
-                $('#team-title').text(data.teamName + ' Player Statistics');
-                $('#team-info').html('**Season:** ' + data.season);
+            if ($('#player-data-table').length) {
+                $('#team-title').text('Tampa Bay Lightning Player Data');
+                $('#team-info').text('Data loaded from players.json. This is a static representation.');
+                return;
+            }
+
+            $.getJSON("players.json", function(data) {
+                
+                if (!data || !data.team || !data.info || !Array.isArray(data.data)) {
+                    $('#team-title').text('Error Loading Data');
+                    $('#team-info').html('<p style="color: red;">Invalid data structure in players.json.</p>');
+                    return;
+                }
+
+                $('#team-title').text(data.team);
+                $('#team-info').text(data.info);
 
                 let tableHTML = '<table id="player-data-table"><thead><tr>';
                 
@@ -1326,125 +1232,204 @@ ${formData.message}`;
             });
         }
 
-        /* --- Assignment 7 Functions: Drag and Drop Card Game --- */
+        
+        let draggedCard = null;
 
-function loadAndRenderCardHand() {
-    $.getJSON('card_images.json', function(data) {
-        if (data && data.cardHandImages) {
-            renderCardHand(data.cardHandImages);
-        } else {
-            $('#card-load-status').text('Error: JSON data is missing "cardHandImages" array.');
+        function getCardImageHTML(cardFileName) {
+            return `<div id="${cardFileName.split('.')[0]}" class="card" draggable="true">
+                        <img src="${CARD_IMAGE_PATH}${cardFileName}" alt="${cardFileName.split('.')[0].replace(/_/g, ' ')}">
+                    </div>`;
         }
-    }).fail(function(jqxhr, textStatus, error) {
-        const err = textStatus + ", " + error;
-        $('#card-load-status').html('Error loading card_images.json: ' + err + '. Please ensure the file exists, is in the same directory, AND you are using a local web server (like Live Server).');
-    });
-}
 
-function renderCardHand(cardData) {
-    const handContainer = $('#card-hand-container');
-    handContainer.empty();
-
-    cardData.forEach(function(card) {
-        const cardElement = $('<div>')
-            .addClass('card')
-            .attr('draggable', true)
-            .attr('id', card.id)
-            .html(`<img src="${CARD_IMAGE_PATH}${card.fileName}" alt="${card.altText}" draggable="false">`); 
+        function loadAndRenderCardHand() {
+            const handContainer = document.getElementById('card-hand-container');
+            const dropZone = document.getElementById('card-drop-zone');
             
-        handContainer.append(cardElement);
-    });
+            
+            handContainer.innerHTML = '';
+            dropZone.innerHTML = '<p class="drop-zone-content">Drop Card Here</p>';
 
-    setupDragAndDrop();
-}
+            const cards = [
+                '2_of_clubs.png', 
+                '3_of_diamonds.png', 
+                '4_of_hearts.png', 
+                'A_of_spades.png' 
+            ];
 
-function setupDragAndDrop() {
-    const cards = document.querySelectorAll('#card-hand-container .card');
-    const dropZone = document.getElementById('card-drop-zone');
-    const handContainer = document.getElementById('card-hand-container');
-    
-    cards.forEach(card => {
-        card.removeEventListener('dragstart', dragstart);
-        card.removeEventListener('dragend', dragend);
-        card.addEventListener('dragstart', dragstart);
-        card.addEventListener('dragend', dragend);
-    });
+            cards.forEach(card => {
+                handContainer.innerHTML += getCardImageHTML(card);
+            });
 
-    dropZone.removeEventListener('dragover', dragover);
-    dropZone.removeEventListener('drop', drop);
-    handContainer.removeEventListener('drop', drop);
-
-    dropZone.addEventListener('dragover', dragover);
-    dropZone.addEventListener('dragenter', dragenter);
-    dropZone.addEventListener('dragleave', dragleave);
-    dropZone.addEventListener('drop', drop);
-    handContainer.addEventListener('dragover', dragover);
-    handContainer.addEventListener('dragenter', dragenter);
-    handContainer.addEventListener('dragleave', dragleave);
-    handContainer.addEventListener('drop', drop);
-}
-
-function dragstart(e) {
-    e.dataTransfer.setData('text/plain', e.target.id);
-    setTimeout(() => e.target.classList.add('dragging'), 0);
-}
-
-function dragend(e) {
-    e.target.classList.remove('dragging');
-}
-
-function dragover(e) {
-    e.preventDefault();
-}
-
-function dragenter(e) {
-    if (e.target.closest('#card-drop-zone')) {
-        document.getElementById('card-drop-zone').classList.add('drag-over');
-    } else if (e.target.closest('#card-hand-container')) {
-        document.getElementById('card-hand-container').classList.add('drag-over');
-    }
-}
-
-function dragleave(e) {
-    if (e.target.id === 'card-drop-zone') {
-        e.target.classList.remove('drag-over');
-    } else if (e.target.id === 'card-hand-container') {
-        e.target.classList.remove('drag-over');
-    }
-}
-
-function drop(e) {
-    e.preventDefault();
-    const cardId = e.dataTransfer.getData('text/plain');
-    const draggedCard = document.getElementById(cardId);
-    const dropZone = document.getElementById('card-drop-zone');
-    const handContainer = document.getElementById('card-hand-container');
-    const dropZoneContent = dropZone.querySelector('.drop-zone-content');
-
-    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-
-    const targetIsDropZone = e.target.closest('#card-drop-zone');
-
-    if (targetIsDropZone) {
-        
-        const existingCard = dropZone.querySelector('.card');
-        if (existingCard) {
-            handContainer.appendChild(existingCard);
+            setupDragAndDropListeners();
         }
-        
-        dropZone.appendChild(draggedCard);
-        dropZoneContent.style.display = 'none';
 
-        // Card generation removed here
-    
-    } else if (e.target.closest('#card-hand-container')) {
-        
-        if (draggedCard.closest('#card-drop-zone')) {
-            dropZoneContent.style.display = 'block';
+        function setupDragAndDropListeners() {
+            const cards = document.querySelectorAll('.card');
+            const dropZone = document.getElementById('card-drop-zone');
+            const handContainer = document.getElementById('card-hand-container');
+
+            cards.forEach(card => {
+                card.addEventListener('dragstart', dragstart);
+                card.addEventListener('dragend', dragend);
+            });
+
+            dropZone.addEventListener('dragover', dragover);
+            dropZone.addEventListener('dragleave', dragleave);
+            dropZone.addEventListener('drop', drop);
+
+            handContainer.addEventListener('dragover', dragover);
+            handContainer.addEventListener('dragleave', dragleave);
+            handContainer.addEventListener('drop', drop);
         }
-        
-        const actualHandContainer = e.target.closest('#card-hand-container');
-        actualHandContainer.appendChild(draggedCard);
-    }
+
+        function dragstart(e) {
+            draggedCard = e.target.closest('.card');
+            e.dataTransfer.setData('text/plain', draggedCard.id);
+            setTimeout(() => {
+                draggedCard.classList.add('dragging');
+            }, 0);
         }
+
+        function dragend(e) {
+            draggedCard.classList.remove('dragging');
+            draggedCard = null;
+        }
+
+        function dragover(e) {
+            e.preventDefault();
+            
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+
+            const targetIsDropZone = e.target.closest('#card-drop-zone');
+            const targetIsHandContainer = e.target.closest('#card-hand-container');
+
+            if (targetIsDropZone) {
+                targetIsDropZone.classList.add('drag-over');
+            } else if (targetIsHandContainer) {
+                targetIsHandContainer.classList.add('drag-over');
+            }
+        }
+
+        function dragleave(e) {
+            if (e.target.id === 'card-drop-zone') {
+                e.target.classList.remove('drag-over');
+            } else if (e.target.id === 'card-hand-container') {
+                e.target.classList.remove('drag-over');
+            }
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            const cardId = e.dataTransfer.getData('text/plain');
+            const draggedCard = document.getElementById(cardId);
+            const dropZone = document.getElementById('card-drop-zone');
+            const handContainer = document.getElementById('card-hand-container');
+            const dropZoneContent = dropZone.querySelector('.drop-zone-content');
+
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+
+            const targetIsDropZone = e.target.closest('#card-drop-zone');
+
+            if (targetIsDropZone) {
+                
+                
+                const existingCard = dropZone.querySelector('.card');
+                if (existingCard) {
+                    
+                    handContainer.appendChild(existingCard);
+                }
+                
+                
+                dropZone.appendChild(draggedCard);
+                dropZoneContent.style.display = 'none'; 
+            
+            } else if (e.target.closest('#card-hand-container')) {
+                
+                
+                if (draggedCard.closest('#card-drop-zone')) {
+                    dropZoneContent.style.display = 'block';
+                }
+                
+                const actualHandContainer = e.target.closest('#card-hand-container');
+                actualHandContainer.appendChild(draggedCard);
+            }
+        }
+
+        
+        function getInventory() {
+            
+            const inventory = localStorage.getItem('inventory');
+            return inventory ? JSON.parse(inventory) : [];
+        }
+
+        function saveInventory(inventory) {
+            
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+        }
+
+        function renderInventory() {
+            const inventory = getInventory();
+            const listContainer = document.getElementById('inventory-list');
+            listContainer.innerHTML = '';
+
+            if (inventory.length === 0) {
+                listContainer.innerHTML = '<p style="text-align: center; color: #777;">No items in inventory. Add one above.</p>';
+                return;
+            }
+
+            let listHTML = '<ul style="list-style-type: none; padding: 0;">';
+            inventory.forEach((item, index) => {
+                listHTML += `
+                    <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dotted #ccc;">
+                        <span><strong>${item.name}</strong></span>
+                        <span>Quantity: ${item.quantity}</span>
+                    </li>
+                `;
+            });
+            listHTML += '</ul>';
+            listContainer.innerHTML = listHTML;
+        }
+
+        function addItemToInventory() {
+            const nameInput = document.getElementById('itemName');
+            const quantityInput = document.getElementById('itemQuantity');
+            
+            const name = nameInput.value.trim();
+            const quantity = parseInt(quantityInput.value);
+
+            if (name === '' || isNaN(quantity) || quantity <= 0) {
+                alert('Please enter a valid item name and a quantity greater than zero.');
+                return;
+            }
+
+            let inventory = getInventory();
+            
+            
+            const existingItemIndex = inventory.findIndex(item => item.name.toLowerCase() === name.toLowerCase());
+
+            if (existingItemIndex > -1) {
+                
+                inventory[existingItemIndex].quantity += quantity;
+            } else {
+                
+                inventory.push({ name: name, quantity: quantity });
+            }
+
+            saveInventory(inventory);
+            renderInventory();
+
+            
+            nameInput.value = '';
+            quantityInput.value = '1';
+        }
+
+        function clearInventory() {
+            if (confirm('Are you sure you want to clear your entire inventory? This cannot be undone.')) {
+                localStorage.removeItem('inventory');
+                renderInventory();
+            }
+        }
+
     </script>
+</body>
+</html>
