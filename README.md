@@ -450,6 +450,80 @@
             padding: 10px;
             color: #2f363d;
         }
+
+        /* --- Assignment 9 CSS: Bouncing Canvas Animation --- */
+        .game-container {
+            font-family: 'Roboto', sans-serif;
+            background-color: #374151;
+            padding: 20px;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
+            max-width: 90vw;
+            width: 700px;
+            margin: 0 auto;
+        }
+        
+        .game-container h1 {
+            color: #f3f4f6;
+            font-size: 1.875rem; 
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        #animationCanvas {
+            display: block;
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            border: 4px solid #10b981;
+            cursor: pointer;
+            touch-action: none;
+            width: 100%; /* Make canvas responsive within container */
+            height: auto;
+        }
+        
+        .control-button-container {
+             display: flex;
+             justify-content: center;
+             margin-top: 1rem;
+             gap: 1rem;
+        }
+
+        .control-button {
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 4px #047857;
+            color: white;
+            font-weight: bold;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1.125rem;
+        }
+        .control-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px #047857;
+        }
+        .control-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px #047857;
+        }
+        
+        #toggleButton {
+            background-color: #10b981; /* green-500 */
+        }
+
+        #resetButton {
+            background-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 4px #1d4ed8; /* blue-700 for shadow */
+        }
+        
+        .game-container p {
+            text-align: center;
+            color: #9ca3af;
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+
     </style>
 </head>
 <body>
@@ -482,7 +556,7 @@
                     <li><a href="#" onclick="showPage('spirograph-page')">Assignment 5</a></li>
                     <li><a href="#" onclick="showPage('assignment-6-page')">Assignment 6</a></li>
                     <li><a href="#" onclick="showPage('assignment-7-page')">Assignment 7</a></li>
-                    <li><a href="#" onclick="showPage('assignment-7-page')">Assignment 9</a></li>
+                    <li><a href="#" onclick="showPage('assignment-9-page')">Assignment 9</a></li>
                 </ul>
             </li>
             <li class="dropdown">
@@ -621,6 +695,24 @@
             </div>
         </section>
 
+        <section id="assignment-9-page" class="page-content"> 
+             <div class="game-container"> 
+                <h1>The Bouncing Cube</h1>
+                <canvas id="animationCanvas" width="660" height="400" class="w-full"></canvas>
+
+                <div class="control-button-container">
+                    <button id="toggleButton" class="control-button">
+                        Stop
+                    </button>
+                    <button id="resetButton" class="control-button">
+                        Reset Position
+                    </button>
+                </div>
+
+                <p>Click or Tap the canvas to make the cube explode!</p>
+            </div>
+        </section>
+
         <section id="form-page" class="page-content">
             <div id="form-container" class="form-section">
                 <h2>Contact Form</h2>
@@ -717,6 +809,22 @@
         let spiroParams = { R: 0, r: 0, O: 0, steps: 0, maxT: 0 };
         const drawingSpeed = 0.1;
         const CARD_IMAGE_PATH = 'PNG-cards-1.3/';
+        
+        /* --- Assignment 9 Variables --- */
+        let cubeAnimationId;
+        let cubeIsRunning = true;
+
+        let cube = {
+            x: 50,
+            y: 50,
+            size: 40,
+            dx: 3,
+            dy: 4,
+            color: '#ef4444'
+        };
+
+        let particles = [];
+        /* ------------------------------ */
 
         window.onload = function() {
             generateCaptcha();
@@ -727,6 +835,11 @@
             const spiroCanvas = document.getElementById('spirograph-canvas');
             spiroCanvas.width = 600; 
             spiroCanvas.height = 600;
+            
+            // Initial call for canvas resize and animation setup (if on assignment-9-page)
+            if (document.getElementById('assignment-9-page').classList.contains('active')) {
+                setupBouncingCubeAnimation();
+            }
         };
 
         function generateCaptcha() {
@@ -750,6 +863,12 @@
                 animationFrameId = null;
                 currentSpiroT = 0;
             }
+            
+            if (cubeAnimationId) {
+                cancelAnimationFrame(cubeAnimationId);
+                cubeAnimationId = null;
+            }
+
 
             if (pageId === 'form-page') {
                 generateCaptcha();
@@ -762,6 +881,10 @@
 
             if (pageId === 'assignment-7-page') {
                 loadAndRenderCardHand();
+            }
+            
+            if (pageId === 'assignment-9-page') {
+                 setupBouncingCubeAnimation();
             }
         }
 
@@ -1329,350 +1452,329 @@ ${formData.message}`;
 
         /* --- Assignment 7 Functions: Drag and Drop Card Game --- */
 
-function loadAndRenderCardHand() {
-    $.getJSON('card_images.json', function(data) {
-        if (data && data.cardHandImages) {
-            renderCardHand(data.cardHandImages);
-        } else {
-            $('#card-load-status').text('Error: JSON data is missing "cardHandImages" array.');
-        }
-    }).fail(function(jqxhr, textStatus, error) {
-        const err = textStatus + ", " + error;
-        $('#card-load-status').html('Error loading card_images.json: ' + err + '. Please ensure the file exists, is in the same directory, AND you are using a local web server (like Live Server).');
-    });
-}
-
-function renderCardHand(cardData) {
-    const handContainer = $('#card-hand-container');
-    handContainer.empty();
-
-    cardData.forEach(function(card) {
-        const cardElement = $('<div>')
-            .addClass('card')
-            .attr('draggable', true)
-            .attr('id', card.id)
-            .html(`<img src="${CARD_IMAGE_PATH}${card.fileName}" alt="${card.altText}" draggable="false">`); 
-            
-        handContainer.append(cardElement);
-    });
-
-    setupDragAndDrop();
-}
-
-function setupDragAndDrop() {
-    const cards = document.querySelectorAll('#card-hand-container .card');
-    const dropZone = document.getElementById('card-drop-zone');
-    const handContainer = document.getElementById('card-hand-container');
-    
-    cards.forEach(card => {
-        card.removeEventListener('dragstart', dragstart);
-        card.removeEventListener('dragend', dragend);
-        card.addEventListener('dragstart', dragstart);
-        card.addEventListener('dragend', dragend);
-    });
-
-    dropZone.removeEventListener('dragover', dragover);
-    dropZone.removeEventListener('drop', drop);
-    handContainer.removeEventListener('drop', drop);
-
-    dropZone.addEventListener('dragover', dragover);
-    dropZone.addEventListener('dragenter', dragenter);
-    dropZone.addEventListener('dragleave', dragleave);
-    dropZone.addEventListener('drop', drop);
-    handContainer.addEventListener('dragover', dragover);
-    handContainer.addEventListener('dragenter', dragenter);
-    handContainer.addEventListener('dragleave', dragleave);
-    handContainer.addEventListener('drop', drop);
-}
-
-function dragstart(e) {
-    e.dataTransfer.setData('text/plain', e.target.id);
-    setTimeout(() => e.target.classList.add('dragging'), 0);
-}
-
-function dragend(e) {
-    e.target.classList.remove('dragging');
-}
-
-function dragover(e) {
-    e.preventDefault();
-}
-
-function dragenter(e) {
-    if (e.target.closest('#card-drop-zone')) {
-        document.getElementById('card-drop-zone').classList.add('drag-over');
-    } else if (e.target.closest('#card-hand-container')) {
-        document.getElementById('card-hand-container').classList.add('drag-over');
-    }
-}
-
-function dragleave(e) {
-    if (e.target.id === 'card-drop-zone') {
-        e.target.classList.remove('drag-over');
-    } else if (e.target.id === 'card-hand-container') {
-        e.target.classList.remove('drag-over');
-    }
-}
-
-function drop(e) {
-    e.preventDefault();
-    const cardId = e.dataTransfer.getData('text/plain');
-    const draggedCard = document.getElementById(cardId);
-    const dropZone = document.getElementById('card-drop-zone');
-    const handContainer = document.getElementById('card-hand-container');
-    const dropZoneContent = dropZone.querySelector('.drop-zone-content');
-
-    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-
-    const targetIsDropZone = e.target.closest('#card-drop-zone');
-
-    if (targetIsDropZone) {
-        
-        const existingCard = dropZone.querySelector('.card');
-        if (existingCard) {
-            handContainer.appendChild(existingCard);
-        }
-        
-        dropZone.appendChild(draggedCard);
-        dropZoneContent.style.display = 'none';
-
-        // Card generation removed here
-    
-    } else if (e.target.closest('#card-hand-container')) {
-        
-        if (draggedCard.closest('#card-drop-zone')) {
-            dropZoneContent.style.display = 'block';
-        }
-        
-        const actualHandContainer = e.target.closest('#card-hand-container');
-        actualHandContainer.appendChild(draggedCard);
-    }
-        }
-<section id="assignment-9-page" class="page-content" style="display: none;">
-    <!-- Local styles for the cube game, ensure this goes inside the section if you don't have a main CSS file -->
-    <style>
-        /* This is the container for the game */
-        .game-container {
-            background-color: #374151;
-            padding: 20px;
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
-            max-width: 90vw;
-            width: 700px;
-            margin: 20px auto; /* Center the game container within the section */
-        }
-        #animationCanvas {
-            display: block;
-            background-color: #f3f4f6;
-            border-radius: 0.5rem;
-            border: 4px solid #10b981;
-            cursor: pointer;
-            touch-action: none;
-        }
-        .control-button {
-            transition: all 0.15s ease-in-out;
-            box-shadow: 0 4px #047857;
-        }
-        .control-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px #047857;
-        }
-        .control-button:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px #047857;
-        }
-    </style>
-    
-    <!-- Game Content Container -->
-    <div class="game-container"> 
-        <h1 class="text-3xl font-bold text-center text-gray-100 mb-4">The Bouncing Cube</h1>
-        
-        <canvas id="animationCanvas" width="660" height="400" class="w-full"></canvas>
-
-        <div class="flex justify-center mt-4 space-x-4">
-            <button id="toggleButton" class="control-button bg-green-500 text-white font-bold py-2 px-6 rounded-lg text-lg">
-                Stop
-            </button>
-            <button id="resetButton" class="control-button bg-blue-500 text-white font-bold py-2 px-6 rounded-lg text-lg">
-                Reset Position
-            </button>
-        </div>
-
-        <p class="text-center text-gray-400 mt-3 text-sm">Click or Tap the canvas to make the cube explode!</p>
-    </div>
-
-    <!-- Game Logic Script -->
-    <script>
-        // Check if the canvas element exists before getting context
-        const canvas = document.getElementById('animationCanvas');
-        if (canvas) {
-            const ctx = canvas.getContext('2d');
-            const toggleButton = document.getElementById('toggleButton');
-            const resetButton = document.getElementById('resetButton');
-
-            let animationFrameId;
-            let isRunning = true;
-
-            let cube = {
-                x: 50,
-                y: 50,
-                size: 40,
-                dx: 3,
-                dy: 4,
-                color: '#ef4444'
-            };
-
-            let particles = [];
-            
-            function resizeCanvas() {
-                const container = canvas.parentElement;
-                const containerWidth = container.clientWidth;
-                
-                const aspectRatio = 660 / 400; 
-                
-                canvas.width = containerWidth;
-                canvas.height = containerWidth / aspectRatio;
-            }
-
-            function drawCube() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = cube.color;
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-                ctx.shadowBlur = 10;
-                ctx.fillRect(cube.x, cube.y, cube.size, cube.size);
-                ctx.shadowBlur = 0;
-            }
-
-            function updateCubePosition() {
-                cube.x += cube.dx;
-                cube.y += cube.dy;
-
-                if (cube.x + cube.size > canvas.width || cube.x < 0) {
-                    cube.dx = -cube.dx;
-                    if (cube.x + cube.size > canvas.width) cube.x = canvas.width - cube.size;
-                    if (cube.x < 0) cube.x = 0;
-                }
-
-                if (cube.y + cube.size > canvas.height || cube.y < 0) {
-                    cube.dy = -cube.dy;
-                    if (cube.y + cube.size > canvas.height) cube.y = canvas.height - cube.size;
-                    if (cube.y < 0) cube.y = 0;
-                }
-            }
-
-            function Particle(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.radius = Math.random() * 3 + 1;
-                this.color = color;
-                this.dx = (Math.random() - 0.5) * (Math.random() * 5);
-                this.dy = (Math.random() - 0.5) * (Math.random() * 5);
-                this.alpha = 1;
-                this.friction = 0.99;
-            }
-
-            Particle.prototype.draw = function() {
-                ctx.save();
-                ctx.globalAlpha = this.alpha;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-                ctx.fill();
-                ctx.restore();
-            }
-
-            Particle.prototype.update = function() {
-                this.dx *= this.friction;
-                this.dy *= this.friction;
-                this.dy += 0.05; 
-                this.x += this.dx;
-                this.y += this.dy;
-                this.alpha -= 0.015;
-            }
-
-            function updateParticles() {
-                for (let i = 0; i < particles.length; i++) {
-                    particles[i].update();
-                    particles[i].draw();
-                }
-                particles = particles.filter(p => p.alpha > 0);
-            }
-
-            function createExplosion(x, y, count = 50, baseColor) {
-                cube.color = '#10b981';
-
-                for (let i = 0; i < count; i++) {
-                    const color = i % 3 === 0 ? '#fde047' : baseColor; 
-                    particles.push(new Particle(x, y, color));
-                }
-                
-                setTimeout(() => {
-                    cube.color = baseColor;
-                }, 100);
-            }
-
-            function animate() {
-                if (isRunning) {
-                    updateCubePosition();
-                    drawCube();
-                    updateParticles();
-                    
-                    animationFrameId = requestAnimationFrame(animate);
-                }
-            }
-            
-            toggleButton.addEventListener('click', () => {
-                if (isRunning) {
-                    isRunning = false;
-                    cancelAnimationFrame(animationFrameId);
-                    toggleButton.textContent = 'Start';
-                    toggleButton.classList.remove('bg-green-500');
-                    toggleButton.classList.add('bg-red-500');
+        function loadAndRenderCardHand() {
+            $.getJSON('card_images.json', function(data) {
+                if (data && data.cardHandImages) {
+                    renderCardHand(data.cardHandImages);
                 } else {
-                    isRunning = true;
-                    animate();
-                    toggleButton.textContent = 'Stop';
-                    toggleButton.classList.remove('bg-red-500');
-                    toggleButton.classList.add('bg-green-500');
+                    $('#card-load-status').text('Error: JSON data is missing "cardHandImages" array.');
                 }
+            }).fail(function(jqxhr, textStatus, error) {
+                const err = textStatus + ", " + error;
+                $('#card-load-status').html('Error loading card_images.json: ' + err + '. Please ensure the file exists, is in the same directory, AND you are using a local web server (like Live Server).');
             });
+        }
 
-            resetButton.addEventListener('click', () => {
-                cube.x = 50;
-                cube.y = 50;
-                cube.dx = 3;
-                cube.dy = 4;
-                particles = [];
-                if (!isRunning) {
-                    drawCube();
-                }
-            });
+        function renderCardHand(cardData) {
+            const handContainer = $('#card-hand-container');
+            handContainer.empty();
 
-            function handleCanvasClick(event) {
-                const rect = canvas.getBoundingClientRect();
-                const clickX = event.clientX - rect.left;
-                const clickY = event.clientY - rect.top;
-
-                if (
-                    clickX >= cube.x &&
-                    clickX <= cube.x + cube.size &&
-                    clickY >= cube.y &&
-                    clickY <= cube.y + cube.size
-                ) {
-                    cube.dx *= (Math.random() > 0.5 ? 1 : -1) * 1.5;
-                    cube.dy *= (Math.random() > 0.5 ? 1 : -1) * 1.5;
+            cardData.forEach(function(card) {
+                const cardElement = $('<div>')
+                    .addClass('card')
+                    .attr('draggable', true)
+                    .attr('id', card.id)
+                    .html(`<img src="${CARD_IMAGE_PATH}${card.fileName}" alt="${card.altText}" draggable="false">`); 
                     
-                    createExplosion(cube.x + cube.size / 2, cube.y + cube.size / 2, 75, cube.color);
+                handContainer.append(cardElement);
+            });
+
+            setupDragAndDrop();
+        }
+
+        function setupDragAndDrop() {
+            const cards = document.querySelectorAll('#card-hand-container .card');
+            const dropZone = document.getElementById('card-drop-zone');
+            const handContainer = document.getElementById('card-hand-container');
+            
+            cards.forEach(card => {
+                card.removeEventListener('dragstart', dragstart);
+                card.removeEventListener('dragend', dragend);
+                card.addEventListener('dragstart', dragstart);
+                card.addEventListener('dragend', dragend);
+            });
+
+            dropZone.removeEventListener('dragover', dragover);
+            dropZone.removeEventListener('drop', drop);
+            handContainer.removeEventListener('drop', drop);
+
+            dropZone.addEventListener('dragover', dragover);
+            dropZone.addEventListener('dragenter', dragenter);
+            dropZone.addEventListener('dragleave', dragleave);
+            dropZone.addEventListener('drop', drop);
+            handContainer.addEventListener('dragover', dragover);
+            handContainer.addEventListener('dragenter', dragenter);
+            handContainer.addEventListener('dragleave', dragleave);
+            handContainer.addEventListener('drop', drop);
+        }
+
+        function dragstart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
+
+        function dragend(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function dragover(e) {
+            e.preventDefault();
+        }
+
+        function dragenter(e) {
+            if (e.target.closest('#card-drop-zone')) {
+                document.getElementById('card-drop-zone').classList.add('drag-over');
+            } else if (e.target.closest('#card-hand-container')) {
+                document.getElementById('card-hand-container').classList.add('drag-over');
+            }
+        }
+
+        function dragleave(e) {
+            if (e.target.id === 'card-drop-zone') {
+                e.target.classList.remove('drag-over');
+            } else if (e.target.id === 'card-hand-container') {
+                e.target.classList.remove('drag-over');
+            }
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            const cardId = e.dataTransfer.getData('text/plain');
+            const draggedCard = document.getElementById(cardId);
+            const dropZone = document.getElementById('card-drop-zone');
+            const handContainer = document.getElementById('card-hand-container');
+            const dropZoneContent = dropZone.querySelector('.drop-zone-content');
+
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+
+            const targetIsDropZone = e.target.closest('#card-drop-zone');
+
+            if (targetIsDropZone) {
+                
+                const existingCard = dropZone.querySelector('.card');
+                if (existingCard) {
+                    handContainer.appendChild(existingCard);
                 }
+                
+                dropZone.appendChild(draggedCard);
+                dropZoneContent.style.display = 'none';
+            
+            } else if (e.target.closest('#card-hand-container')) {
+                
+                if (draggedCard.closest('#card-drop-zone')) {
+                    dropZoneContent.style.display = 'block';
+                }
+                
+                const actualHandContainer = e.target.closest('#card-hand-container');
+                actualHandContainer.appendChild(draggedCard);
+            }
+        }
+
+        /* --- Assignment 9 Functions: Bouncing Canvas Animation --- */
+        
+        let canvasA9, ctxA9, toggleButtonA9, resetButtonA9;
+
+        function setupBouncingCubeAnimation() {
+            canvasA9 = document.getElementById('animationCanvas');
+            toggleButtonA9 = document.getElementById('toggleButton');
+            resetButtonA9 = document.getElementById('resetButton');
+            
+            if (!canvasA9) return;
+            
+            ctxA9 = canvasA9.getContext('2d');
+            
+            // Set initial state and listeners
+            resizeCanvasA9();
+            
+            // Remove old listeners to prevent duplicates
+            canvasA9.removeEventListener('click', handleCanvasClickA9);
+            toggleButtonA9.removeEventListener('click', toggleAnimationA9);
+            resetButtonA9.removeEventListener('click', resetPositionA9);
+            window.removeEventListener('resize', resizeCanvasA9);
+
+
+            // Add new listeners
+            canvasA9.addEventListener('click', handleCanvasClickA9);
+            toggleButtonA9.addEventListener('click', toggleAnimationA9);
+            resetButtonA9.addEventListener('click', resetPositionA9);
+            window.addEventListener('resize', resizeCanvasA9);
+
+            // Set button text/style based on current state
+            if (cubeIsRunning) {
+                toggleButtonA9.textContent = 'Stop';
+                toggleButtonA9.classList.remove('bg-red-500');
+                toggleButtonA9.classList.add('bg-green-500');
+            } else {
+                 toggleButtonA9.textContent = 'Start';
+                toggleButtonA9.classList.remove('bg-green-500');
+                toggleButtonA9.classList.add('bg-red-500');
+            }
+            
+            // Start or restart animation loop
+            if (cubeIsRunning) {
+                if (cubeAnimationId) cancelAnimationFrame(cubeAnimationId);
+                animateA9();
+            } else {
+                drawCubeA9();
+                updateParticlesA9();
+            }
+        }
+
+        function resizeCanvasA9() {
+            const container = canvasA9.parentElement;
+            const containerWidth = container.clientWidth;
+            
+            const aspectRatio = 660 / 400; 
+            
+            // This sets the logical dimensions (drawing surface)
+            canvasA9.width = 660;
+            canvasA9.height = 400;
+            
+            // This sets the display dimensions
+            canvasA9.style.width = containerWidth + 'px';
+            canvasA9.style.height = (containerWidth / aspectRatio) + 'px';
+        }
+
+        function drawCubeA9() {
+            if (!ctxA9) return;
+            ctxA9.clearRect(0, 0, canvasA9.width, canvasA9.height);
+            ctxA9.fillStyle = cube.color;
+            ctxA9.shadowColor = 'rgba(0, 0, 0, 0.4)';
+            ctxA9.shadowBlur = 10;
+            ctxA9.fillRect(cube.x, cube.y, cube.size, cube.size);
+            ctxA9.shadowBlur = 0;
+        }
+
+        function updateCubePositionA9() {
+            cube.x += cube.dx;
+            cube.y += cube.dy;
+
+            if (cube.x + cube.size > canvasA9.width || cube.x < 0) {
+                cube.dx = -cube.dx;
+                if (cube.x + cube.size > canvasA9.width) cube.x = canvasA9.width - cube.size;
+                if (cube.x < 0) cube.x = 0;
             }
 
-            canvas.addEventListener('click', handleCanvasClick);
+            if (cube.y + cube.size > canvasA9.height || cube.y < 0) {
+                cube.dy = -cube.dy;
+                if (cube.y + cube.size > canvasA9.height) cube.y = canvasA9.height - cube.size;
+                if (cube.y < 0) cube.y = 0;
+            }
+        }
+
+        function ParticleA9(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.radius = Math.random() * 3 + 1;
+            this.color = color;
+            this.dx = (Math.random() - 0.5) * (Math.random() * 5);
+            this.dy = (Math.random() - 0.5) * (Math.random() * 5);
+            this.alpha = 1;
+            this.friction = 0.99;
+        }
+
+        ParticleA9.prototype.draw = function() {
+            ctxA9.save();
+            ctxA9.globalAlpha = this.alpha;
+            ctxA9.fillStyle = this.color;
+            ctxA9.beginPath();
+            ctxA9.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            ctxA9.fill();
+            ctxA9.restore();
+        }
+
+        ParticleA9.prototype.update = function() {
+            this.dx *= this.friction;
+            this.dy *= this.friction;
+            this.dy += 0.05; 
+            this.x += this.dx;
+            this.y += this.dy;
+            this.alpha -= 0.015;
+        }
+
+        function updateParticlesA9() {
+            if (!ctxA9) return;
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            particles = particles.filter(p => p.alpha > 0);
+        }
+
+        function createExplosionA9(x, y, count = 50, baseColor) {
+            cube.color = '#10b981';
+
+            for (let i = 0; i < count; i++) {
+                const color = i % 3 === 0 ? '#fde047' : baseColor; 
+                particles.push(new ParticleA9(x, y, color));
+            }
             
-            window.addEventListener('resize', resizeCanvas);
-            // Since this script is likely loaded when the section is shown, 
-            // we initiate the animation immediately after everything is defined.
-            // This is safer than relying on a global window.onload.
-            resizeCanvas();
-            animate();
+            setTimeout(() => {
+                cube.color = baseColor;
+            }, 100);
+        }
+
+        function animateA9() {
+            if (cubeIsRunning && ctxA9) {
+                updateCubePositionA9();
+                drawCubeA9();
+                updateParticlesA9();
+                
+                cubeAnimationId = requestAnimationFrame(animateA9);
+            }
+        }
+        
+        function toggleAnimationA9() {
+            if (cubeIsRunning) {
+                cubeIsRunning = false;
+                cancelAnimationFrame(cubeAnimationId);
+                cubeAnimationId = null;
+                toggleButtonA9.textContent = 'Start';
+                toggleButtonA9.classList.remove('bg-green-500');
+                toggleButtonA9.classList.add('bg-red-500');
+            } else {
+                cubeIsRunning = true;
+                animateA9();
+                toggleButtonA9.textContent = 'Stop';
+                toggleButtonA9.classList.remove('bg-red-500');
+                toggleButtonA9.classList.add('bg-green-500');
+            }
+        }
+
+        function resetPositionA9() {
+            cube.x = 50;
+            cube.y = 50;
+            cube.dx = 3;
+            cube.dy = 4;
+            cube.color = '#ef4444'; // Reset color back to red
+            particles = [];
+            if (!cubeIsRunning && ctxA9) {
+                drawCubeA9();
+                updateParticlesA9();
+            } else if (cubeIsRunning) {
+                // If running, the animation loop will handle the draw
+            }
+        }
+
+        function handleCanvasClickA9(event) {
+            const rect = canvasA9.getBoundingClientRect();
+            // Scale click coordinates from display size to logical canvas size
+            const scaleX = canvasA9.width / rect.width;
+            const scaleY = canvasA9.height / rect.height;
+            
+            const clickX = (event.clientX - rect.left) * scaleX;
+            const clickY = (event.clientY - rect.top) * scaleY;
+
+            if (
+                clickX >= cube.x &&
+                clickX <= cube.x + cube.size &&
+                clickY >= cube.y &&
+                clickY <= cube.y + cube.size
+            ) {
+                cube.dx *= (Math.random() > 0.5 ? 1 : -1) * 1.5;
+                cube.dy *= (Math.random() > 0.5 ? 1 : -1) * 1.5;
+                
+                createExplosionA9(cube.x + cube.size / 2, cube.y + cube.size / 2, 75, cube.color);
+            }
         }
     </script>
