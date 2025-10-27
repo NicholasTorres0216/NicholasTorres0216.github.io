@@ -1676,9 +1676,3 @@ function drop(e) {
             animate();
         }
     </script>
-
-    
-    
-
-
-
