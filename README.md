@@ -557,7 +557,8 @@
                     <li><a href="#" onclick="showPage('assignment-6-page')">Assignment 6</a></li>
                     <li><a href="#" onclick="showPage('assignment-7-page')">Assignment 7</a></li>
                     <li><a href="#" onclick="showPage('assignment-9-page')">Assignment 9</a></li>
-                </ul>
+                    <li><a href="#" onclick="showPage('assignment-10-page')">Assignment 10</a></li>
+                    </ul>
             </li>
             <li class="dropdown">
                 <a href="#">Favorite Sites</a>
@@ -712,7 +713,14 @@
                 <p>Click or Tap the canvas to make the cube explode!</p>
             </div>
         </section>
-
+        
+        <section id="assignment-10-page" class="page-content"> 
+            <div class="form-section" style="max-width: 800px; text-align: center;">
+                <h2>Assignment 10: Lighthouse Report</h2>
+                <p>This is a screenshot of the Lighthouse audit results for the site's performance, accessibility, and best practices.</p>
+                <img src="Lighthouse Report.JPG" alt="Screenshot of a Lighthouse performance report with a score of 67." style="max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 1rem;">
+            </div>
+        </section>
         <section id="form-page" class="page-content">
             <div id="form-container" class="form-section">
                 <h2>Contact Form</h2>
