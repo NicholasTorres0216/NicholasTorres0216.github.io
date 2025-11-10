@@ -722,6 +722,13 @@
                 <img src="Lighthouse Report.JPG" alt="Screenshot of a Lighthouse performance report with a score of 67." style="max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 1rem;">
             </div>
         </section>
+        <section id="assignment-11-page" class="page-content"> 
+            <div class="form-section" style="max-width: 800px; text-align: center;">
+                <h2>Assignment 11: Your Project Title</h2>
+                <p>This is the placeholder content for Assignment 11. You can replace this text and add your specific HTML structure and elements here.</p>
+                
+                </div>
+        </section>
         <section id="form-page" class="page-content">
             <div id="form-container" class="form-section">
                 <h2>Contact Form</h2>
