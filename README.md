@@ -558,6 +558,7 @@
                     <li><a href="#" onclick="showPage('assignment-7-page')">Assignment 7</a></li>
                     <li><a href="#" onclick="showPage('assignment-9-page')">Assignment 9</a></li>
                     <li><a href="#" onclick="showPage('assignment-10-page')">Assignment 10</a></li>
+                    <li><a href="#" onclick="showPage('assignment-11-page')">Assignment 11</a></li>
                     </ul>
             </li>
             <li class="dropdown">
