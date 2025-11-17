@@ -278,34 +278,35 @@
             color: #4a5568;
         }
 
-        #player-data-container {
+        #player-data-container, #cms-data-container {
             padding: 1rem;
             margin-top: 1rem;
+            overflow-x: auto; /* Added for responsiveness in tables */
         }
 
-        #player-data-table {
+        #player-data-table, #cms-data-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
         }
 
-        #player-data-table th, #player-data-table td {
+        #player-data-table th, #player-data-table td, #cms-data-table th, #cms-data-table td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
 
-        #player-data-table th {
+        #player-data-table th, #cms-data-table th {
             background-color: #2f363d;
             color: white;
             font-weight: 700;
         }
 
-        #player-data-table tr:nth-child(even) {
+        #player-data-table tr:nth-child(even), #cms-data-table tr:nth-child(even) {
             background-color: #f4f4f4;
         }
 
-        #player-data-table tr:hover {
+        #player-data-table tr:hover, #cms-data-table tr:hover {
             background-color: #e8e8e8;
         }
 
@@ -522,41 +523,6 @@
             margin-top: 0.75rem;
             font-size: 0.875rem;
         }
-        
-        /* --- Assignment 11 CSS: Simple Clicker Game --- */
-        .clicker-container {
-            font-family: 'Roboto', sans-serif;
-            background-color: #ecf0f1;
-            padding: 20px;
-            border-radius: 1rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            max-width: 90vw;
-            width: 700px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .clicker-container h2 {
-            color: #2c3e50;
-            margin-bottom: 1rem;
-        }
-
-        #gameScore {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #2980b9;
-            margin-bottom: 1rem;
-        }
-
-        #clickerCanvas {
-            display: block;
-            background-color: #ffffff;
-            border-radius: 0.5rem;
-            border: 4px solid #f39c12;
-            cursor: crosshair;
-            width: 100%;
-            height: 400px;
-        }
 
 
     </style>
@@ -594,7 +560,7 @@
                     <li><a href="#" onclick="showPage('assignment-9-page')">Assignment 9</a></li>
                     <li><a href="#" onclick="showPage('assignment-10-page')">Assignment 10</a></li>
                     <li><a href="#" onclick="showPage('assignment-11-page')">Assignment 11</a></li>
-                    </ul>
+                    <li><a href="#" onclick="showPage('assignment-12-page')">Assignment 12</a></li> </ul>
             </li>
             <li class="dropdown">
                 <a href="#">Favorite Sites</a>
@@ -757,16 +723,15 @@
                 <img src="Lighthouse Report.JPG" alt="Screenshot of a Lighthouse performance report with a score of 67." style="max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 1rem;">
             </div>
         </section>
-
-        <section id="assignment-11-page" class="page-content">
-            <div class="clicker-container">
-                <h2>Assignment 11: Target Clicker Game</h2>
-                <p id="gameScore">Score: 0</p>
-                <canvas id="clickerCanvas" width="660" height="400"></canvas>
-                <p>Click the moving yellow target as fast as you can to score points!</p>
+        <section id="assignment-12-page" class="page-content"> <div class="form-section" style="max-width: 900px;">
+                <h2 id="cms-title">Content Management Systems Research</h2>
+                <p style="text-align: center;">A comparative analysis of five Content Management Systems, generated from `cms.json`.</p>
+                
+                <div id="cms-data-container">
+                    <p id="cms-load-status" style="text-align: center;">Loading CMS data...</p>
+                </div>
             </div>
         </section>
-
         <section id="form-page" class="page-content">
             <div id="form-container" class="form-section">
                 <h2>Contact Form</h2>
@@ -880,20 +845,6 @@
         let particles = [];
         /* ------------------------------ */
 
-        /* --- Assignment 11 Variables --- */
-        let clickerCanvas, ctxClicker, clickerAnimationFrameId;
-        let score = 0;
-        let target = {
-            x: 100,
-            y: 100,
-            radius: 20,
-            dx: 2,
-            dy: 3,
-            color: '#f1c40f'
-        };
-        /* ------------------------------ */
-
-
         window.onload = function() {
             generateCaptcha();
             setupValidationListeners();
@@ -937,11 +888,6 @@
                 cubeAnimationId = null;
             }
 
-            if (clickerAnimationFrameId) {
-                cancelAnimationFrame(clickerAnimationFrameId);
-                clickerAnimationFrameId = null;
-            }
-
 
             if (pageId === 'form-page') {
                 generateCaptcha();
@@ -960,8 +906,8 @@
                  setupBouncingCubeAnimation();
             }
 
-            if (pageId === 'assignment-11-page') {
-                setupClickerGame();
+            if (pageId === 'assignment-12-page') { // NEW: Assignment 12 loading
+                loadCMSData();
             }
         }
 
@@ -1527,6 +1473,45 @@ ${formData.message}`;
             });
         }
 
+        /* --- Assignment 12 Function: Load CMS Data --- */
+        function loadCMSData() {
+            $.getJSON('cms.json', function(data) {
+                const container = $('#cms-data-container');
+                container.empty();
+                
+                if (data && data.cmsSystems && data.cmsSystems.length > 0) {
+                    
+                    const headers = ['Name', 'Support', 'Technology', 'Capabilities', 'Limitations', 'Example Site'];
+                    
+                    let tableHTML = '<table id="cms-data-table"><thead><tr>';
+                    headers.forEach(function(header) {
+                        tableHTML += '<th>' + header + '</th>';
+                    });
+                    tableHTML += '</tr></thead><tbody>';
+
+                    data.cmsSystems.forEach(function(cms) {
+                        tableHTML += '<tr>';
+                        tableHTML += '<td>' + cms.Name + '</td>';
+                        tableHTML += '<td>' + cms.Support + '</td>';
+                        tableHTML += '<td>' + cms.Technology + '</td>';
+                        tableHTML += '<td>' + cms.Capabilities + '</td>';
+                        tableHTML += '<td>' + cms.Limitations + '</td>';
+                        tableHTML += '<td><a href="' + cms.ExampleLink + '" target="_blank">' + cms.ExampleSite + '</a></td>';
+                        tableHTML += '</tr>';
+                    });
+
+                    tableHTML += '</tbody></table>';
+                    container.html(tableHTML);
+                } else {
+                    container.html('<p id="cms-load-status" style="color: red;">Error: `cms.json` is either empty or missing the `cmsSystems` array.</p>');
+                }
+
+            }).fail(function(jqxhr, textStatus, error) {
+                const err = textStatus + ", " + error;
+                $('#cms-data-container').html('<p id="cms-load-status" style="color: red;">Could not load `cms.json`: ' + err + '. Please ensure the file exists and is valid JSON and that the JSON file is in the same directory as this HTML file.</p>');
+            });
+        }
+
         /* --- Assignment 7 Functions: Drag and Drop Card Game --- */
 
         function loadAndRenderCardHand() {
@@ -1854,106 +1839,6 @@ ${formData.message}`;
                 createExplosionA9(cube.x + cube.size / 2, cube.y + cube.size / 2, 75, cube.color);
             }
         }
-        
-        /* --- Assignment 11 Functions: Simple Clicker Game --- */
-        function setupClickerGame() {
-            clickerCanvas = document.getElementById('clickerCanvas');
-            
-            if (!clickerCanvas) return;
-            
-            ctxClicker = clickerCanvas.getContext('2d');
-            
-            // Remove old listeners to prevent duplicates
-            clickerCanvas.removeEventListener('click', handleClick);
-
-            // Add new listener
-            clickerCanvas.addEventListener('click', handleClick);
-
-            // Reset score and target position
-            score = 0;
-            document.getElementById('gameScore').textContent = 'Score: 0';
-            target.x = clickerCanvas.width / 2;
-            target.y = clickerCanvas.height / 2;
-            target.dx = (Math.random() * 4 + 1) * (Math.random() < 0.5 ? 1 : -1); 
-            target.dy = (Math.random() * 4 + 1) * (Math.random() < 0.5 ? 1 : -1); 
-            target.radius = 20;
-            
-            // Start the animation loop
-            if (clickerAnimationFrameId) cancelAnimationFrame(clickerAnimationFrameId);
-            gameLoop();
-        }
-
-        function drawGame() {
-            if (!ctxClicker) return;
-            ctxClicker.clearRect(0, 0, clickerCanvas.width, clickerCanvas.height);
-            
-            // Update target position
-            target.x += target.dx;
-            target.y += target.dy;
-
-            // Bounce off walls
-            if (target.x + target.radius > clickerCanvas.width || target.x - target.radius < 0) {
-                target.dx = -target.dx;
-                // Keep target within bounds
-                if (target.x + target.radius > clickerCanvas.width) target.x = clickerCanvas.width - target.radius;
-                if (target.x - target.radius < 0) target.x = target.radius;
-            }
-            if (target.y + target.radius > clickerCanvas.height || target.y - target.radius < 0) {
-                target.dy = -target.dy;
-                // Keep target within bounds
-                if (target.y + target.radius > clickerCanvas.height) target.y = clickerCanvas.height - target.radius;
-                if (target.y - target.radius < 0) target.y = target.radius;
-            }
-            
-            // Draw Target
-            ctxClicker.fillStyle = target.color;
-            ctxClicker.beginPath();
-            ctxClicker.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
-            ctxClicker.fill();
-        }
-        
-        function gameLoop() {
-            drawGame();
-            clickerAnimationFrameId = requestAnimationFrame(gameLoop);
-        }
-
-        function handleClick(event) {
-            const rect = clickerCanvas.getBoundingClientRect();
-            // Scale click coordinates from display size to logical canvas size
-            const scaleX = clickerCanvas.width / rect.width;
-            const scaleY = clickerCanvas.height / rect.height;
-            
-            const clickX = (event.clientX - rect.left) * scaleX;
-            const clickY = (event.clientY - rect.top) * scaleY;
-
-            const distance = Math.sqrt(Math.pow(clickX - target.x, 2) + Math.pow(clickY - target.y, 2));
-
-            if (distance < target.radius) {
-                // Hit! Increase score
-                score++;
-                document.getElementById('gameScore').textContent = 'Score: ' + score;
-                
-                // Move target to a new random location and change speed/size
-                target.radius = Math.random() * 15 + 15; // Random size between 15 and 30
-                
-                // Ensure new position is within canvas bounds
-                target.x = Math.random() * (clickerCanvas.width - 2 * target.radius) + target.radius;
-                target.y = Math.random() * (clickerCanvas.height - 2 * target.radius) + target.radius;
-                
-                target.dx = (Math.random() * 4 + 1) * (Math.random() < 0.5 ? 1 : -1); 
-                target.dy = (Math.random() * 4 + 1) * (Math.random() < 0.5 ? 1 : -1); 
-                
-                // Add a visual flash on hit (optional, but a nice touch)
-                ctxClicker.fillStyle = '#2ecc71';
-                ctxClicker.fillRect(0, 0, clickerCanvas.width, clickerCanvas.height);
-                setTimeout(() => {
-                    // Force a redraw of the target to remove the flash quickly
-                    drawGame();
-                }, 50);
-            }
-        }
-        /* ------------------------------------------------------------------- */
-
     </script>
 
 }
