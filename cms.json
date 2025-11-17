@@ -1,0 +1,49 @@
+{
+    "cmsSystems": [
+        {
+            "Name": "WordPress",
+            "Support": "Open Source, Supported by most hosting companies",
+            "Technology": "PHP/MySQL",
+            "Capabilities": "Supports themes, supports plugins (50,000+), REST API, robust community support.",
+            "Limitations": "Security depends heavily on third-party plugins/themes, performance can degrade without caching, steep learning curve for developers.",
+            "ExampleSite": "The White House",
+            "ExampleLink": "https://www.whitehouse.gov/"
+        },
+        {
+            "Name": "Joomla!",
+            "Support": "Open Source, Community Driven",
+            "Technology": "PHP/MySQL (also PostgreSQL, SQL Server)",
+            "Capabilities": "Built-in multilingual support, strong Access Control List (ACL) features, powerful for complex data structures and portals.",
+            "Limitations": "Less user-friendly than WordPress for beginners, fewer extensions compared to WordPress, major version upgrades can be complex.",
+            "ExampleSite": "Linux.com",
+            "ExampleLink": "https://www.linux.com/"
+        },
+        {
+            "Name": "Drupal",
+            "Support": "Open Source, Community Driven",
+            "Technology": "PHP/PostgreSQL or MySQL",
+            "Capabilities": "Highly scalable and secure, excellent for enterprise-level applications and government sites, flexible content modeling (CCK).",
+            "Limitations": "Requires significant development knowledge, smallest community of the big three (WP, Joomla, Drupal), higher hosting requirements.",
+            "ExampleSite": "Nasa.gov",
+            "ExampleLink": "https://www.nasa.gov/"
+        },
+        {
+            "Name": "Shopify",
+            "Support": "Commercial (Subscription/SaaS)",
+            "Technology": "Ruby on Rails (Backend), Liquid (Template Language)",
+            "Capabilities": "Fully managed hosting, integrated payment processing, excellent for e-commerce, simple setup and maintenance.",
+            "Limitations": "Monthly subscription fees, limited control over core code/server, customization is restricted by the platform's API.",
+            "ExampleSite": "Tesla Motors",
+            "ExampleLink": "https://shop.tesla.com/"
+        },
+        {
+            "Name": "Wix",
+            "Support": "Commercial (Subscription/SaaS)",
+            "Technology": "Wix's proprietary server-side technology, JavaScript/React (Client)",
+            "Capabilities": "Drag-and-drop editor, zero-coding required for basic sites, extensive template library, integrated marketing tools.",
+            "Limitations": "Not easily transferable (site locked to Wix platform), performance can be suboptimal for large sites, free tier shows Wix ads.",
+            "ExampleSite": "Karlie Kloss",
+            "ExampleLink": "https://www.karliekloss.com/"
+        }
+    ]
+}
